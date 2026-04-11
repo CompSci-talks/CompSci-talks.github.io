@@ -1,0 +1,11 @@
+# Prettier ignore
+/dist
+/node_modules
+/tmp
+/out-tsc
+/bazel-out
+/.angular/cache
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+coverage/
