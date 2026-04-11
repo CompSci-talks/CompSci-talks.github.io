@@ -1,0 +1,217 @@
+/* ============================================================
+   Global base + @layer components for CompSci Talks
+   All color references use tailwind.config.js semantic tokens.
+   ============================================================ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+
+    /* Force light color scheme throughout — prevents OS dark mode from
+       inverting browser-native UI elements (scrollbars, form controls, etc.)
+       and stops any inherited `dark:` variants from firing unintentionally. */
+    :root {
+        color-scheme: light;
+    }
+
+    html,
+    body {
+        @apply bg-surface text-text-main;
+    }
+
+    html {
+        @apply font-sans font-light text-text-main antialiased;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        @apply font-display tracking-tight text-text-main;
+    }
+
+    /* Remove Firefox's default validation styling that causes violet/red borders */
+    input:-moz-ui-invalid,
+    textarea:-moz-ui-invalid,
+    select:-moz-ui-invalid {
+        box-shadow: none;
+    }
+}
+
+@layer components {
+
+    /* ── Layout Helpers ────────────────────────────────────────── */
+    .container-main {
+        @apply max-w-5xl mx-auto px-4 sm:px-6 lg:px-8;
+    }
+
+    .section-padding {
+        @apply py-8 sm:py-12 lg:py-16;
+    }
+
+    /* ── Buttons ──────────────────────────────────────────────── */
+    .btn {
+        @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-150 select-none;
+    }
+
+    // .btn-primary {
+    //     @apply btn bg-primary text-white hover:bg-primary-hover active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/40;
+    // }
+    .btn-primary {
+        @apply btn bg-primary text-white hover:bg-primary-hover active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:bg-gray-400 disabled:text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 disabled:hover:bg-gray-400;
+    }
+
+    .btn-outline {
+        @apply btn border border-border bg-surface text-text-muted hover:text-primary hover:border-primary hover:bg-primary-light shadow-sm;
+    }
+
+    .btn-danger {
+        @apply btn bg-status-error text-white hover:bg-red-600 active:scale-95 focus:outline-none focus:ring-2 focus:ring-status-error/40;
+    }
+
+    .btn-admin {
+        @apply btn bg-admin text-white hover:bg-admin-hover active:scale-95 shadow-lg focus:outline-none focus:ring-4 focus:ring-admin/30;
+    }
+
+    /* ── Ghost button ─────────────────────────────────────────── */
+    .btn-ghost {
+        @apply btn text-text-muted hover:text-text-main hover:bg-surface-muted transition-colors;
+    }
+
+    /* ── Form & Containers ────────────────────────────────────── */
+    .card {
+        @apply bg-surface-card rounded-2xl border border-border p-6 shadow-premium transition-all duration-200 hover:shadow-premium-hover;
+    }
+
+    .input-field {
+        @apply w-full px-4 py-2 bg-surface text-text-main placeholder:text-text-faint border border-border rounded-lg shadow-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 ease-in-out;
+    }
+
+    .input-field-sm {
+        @apply w-full px-3 py-2 bg-surface text-text-main placeholder:text-text-faint border border-border rounded-lg shadow-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 ease-in-out text-sm;
+    }
+
+    /* Admin variant: rounded-xl for consistency with admin components */
+    .input-field-admin {
+        @apply w-full px-4 py-3 bg-surface text-text-main placeholder:text-text-faint border border-border rounded-xl shadow-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 ease-in-out;
+    }
+
+    /* ── Admin Page Header — shared across all admin pages ───────
+       Usage: wrap your page title + subtitle in .admin-page-header  */
+    .admin-page-header {
+        @apply mb-8;
+    }
+
+    .admin-page-title {
+        @apply text-2xl font-bold text-text-main font-display tracking-tight;
+    }
+
+    .admin-page-subtitle {
+        @apply text-sm text-text-muted mt-1;
+    }
+
+    /* ── Admin Section Card ───────────────────────────────────── */
+    .admin-card {
+        @apply bg-surface-card rounded-xl border border-border shadow-sm overflow-hidden;
+    }
+
+    /* ── Table Cells ──────────────────────────────────────────── */
+    .th-cell {
+        @apply px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider;
+    }
+
+    .td-cell {
+        @apply px-6 py-4 whitespace-nowrap text-sm text-text-main;
+    }
+
+    /* ── Action Links ─────────────────────────────────────────── */
+    .action-link {
+        @apply text-sm font-semibold transition-colors flex items-center gap-1;
+    }
+
+    .action-link-edit {
+        @apply action-link text-status-info hover:text-primary;
+    }
+
+    .action-link-delete {
+        @apply action-link text-status-error hover:text-red-700;
+    }
+
+    .action-link-admin {
+        @apply action-link text-admin hover:text-admin-hover;
+    }
+
+    /* ── Status Badges ────────────────────────────────────────── */
+    .badge {
+        @apply inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium;
+    }
+
+    .badge-success {
+        @apply badge bg-status-success/10 text-status-success;
+    }
+
+    .badge-warning {
+        @apply badge bg-status-warning/10 text-status-warning;
+    }
+
+    .badge-error {
+        @apply badge bg-status-error/10 text-status-error;
+    }
+
+    .badge-info {
+        @apply badge bg-status-info/10 text-status-info;
+    }
+
+    .badge-neutral {
+        @apply badge bg-surface-elevated text-text-muted;
+    }
+
+    /* ── Role Badges ──────────────────────────────────────────── */
+    .badge-role-admin {
+        @apply badge bg-role-admin-bg text-role-admin-text;
+    }
+
+    .badge-role-moderator {
+        @apply badge bg-role-moderator-bg text-role-moderator-text;
+    }
+
+    .badge-role-user {
+        @apply badge bg-role-user-bg text-role-user-text;
+    }
+
+    /* ── Link button (inline text action) ────────────────────── */
+    .btn-link-admin {
+        @apply text-sm text-admin hover:text-admin-hover transition-colors;
+    }
+
+    /* ── Skeleton Loading ─────────────────────────────────────── */
+    .skeleton {
+        @apply bg-skeleton rounded animate-pulse;
+    }
+
+    .skeleton-dark {
+        @apply bg-skeleton-dark rounded animate-pulse;
+    }
+
+
+
+    quill-editor .ql-container {
+        min-height: 400px;
+        font-size: 15px;
+    }
+
+    quill-editor .ql-editor {
+        min-height: 400px;
+    }
+
+    input[type="password"]::-ms-reveal,
+    input[type="password"]::-ms-clear,
+    input[type="password"]::-webkit-contacts-auto-fill-button,
+    input[type="password"]::-webkit-credentials-auto-fill-button {
+        display: none;
+    }
+}

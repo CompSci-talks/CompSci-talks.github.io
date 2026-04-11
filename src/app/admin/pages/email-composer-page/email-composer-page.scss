@@ -1,0 +1,110 @@
+:host {
+    display: block;
+}
+
+/* 
+  Quill SNOW theme overrides 
+  We use ::ng-deep because Quill injects its own DOM structure 
+  under the root quill-editor element.
+*/
+
+::ng-deep {
+    .ql-toolbar.ql-snow {
+        border: none !important;
+        border-bottom: 1px solid theme('colors.border.DEFAULT') !important;
+        background: theme('colors.surface.muted') !important;
+        padding: 0.75rem 1.5rem !important;
+        border-radius: 0 !important;
+    }
+
+    .ql-container.ql-snow {
+        border: none !important;
+        font-family: inherit !important;
+        font-size: 1rem !important;
+    }
+
+    .ql-editor {
+        min-height: 450px !important;
+        padding: 2rem !important;
+        color: theme('colors.text.main') !important;
+        line-height: 1.6 !important;
+
+        /* Re-adding basic HTML styles that might be stripped by Preflight */
+        h1 {
+            @apply text-3xl font-bold mb-4 mt-6;
+        }
+
+        h2 {
+            @apply text-2xl font-bold mb-3 mt-5;
+        }
+
+        h3 {
+            @apply text-xl font-bold mb-2 mt-4;
+        }
+
+        p {
+            @apply mb-4;
+        }
+
+        ul {
+            @apply list-disc ml-6 mb-4;
+        }
+
+        ol {
+            @apply list-decimal ml-6 mb-4;
+        }
+
+        blockquote {
+            @apply border-l-4 border-border pl-4 italic my-4;
+        }
+
+        code {
+            @apply bg-surface-muted px-1.5 py-0.5 rounded text-sm font-mono;
+        }
+
+        pre {
+            @apply bg-surface-muted p-4 rounded-xl my-4 overflow-x-auto;
+        }
+
+        &.ql-blank::before {
+            color: theme('colors.text.faint') !important;
+            font-style: italic !important;
+            left: 2rem !important;
+        }
+    }
+
+    /* Toolbar button hover states */
+    .ql-snow.ql-toolbar button:hover,
+    .ql-snow .ql-toolbar button:hover,
+    .ql-snow.ql-toolbar button:focus,
+    .ql-snow .ql-toolbar button:focus,
+    .ql-snow.ql-toolbar button.ql-active,
+    .ql-snow .ql-toolbar button.ql-active,
+    .ql-snow.ql-toolbar .ql-picker-label:hover,
+    .ql-snow .ql-toolbar .ql-picker-label:hover,
+    .ql-snow.ql-toolbar .ql-picker-label.ql-active,
+    .ql-snow .ql-toolbar .ql-picker-label.ql-active,
+    .ql-snow.ql-toolbar .ql-picker-item:hover,
+    .ql-snow .ql-toolbar .ql-picker-item:hover,
+    .ql-snow.ql-toolbar .ql-picker-item.ql-selected,
+    .ql-snow .ql-toolbar .ql-picker-item.ql-selected {
+        color: theme('colors.primary.DEFAULT') !important;
+    }
+
+    .ql-snow.ql-toolbar button:hover .ql-stroke,
+    .ql-snow .ql-toolbar button:hover .ql-stroke,
+    .ql-snow.ql-toolbar button:focus .ql-stroke,
+    .ql-snow .ql-toolbar button:focus .ql-stroke,
+    .ql-snow.ql-toolbar button.ql-active .ql-stroke,
+    .ql-snow .ql-toolbar button.ql-active .ql-stroke,
+    .ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke,
+    .ql-snow .ql-toolbar .ql-picker-label:hover .ql-stroke,
+    .ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke,
+    .ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-stroke,
+    .ql-snow.ql-toolbar .ql-picker-item:hover .ql-stroke,
+    .ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke,
+    .ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke,
+    .ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke {
+        stroke: theme('colors.primary.DEFAULT') !important;
+    }
+}

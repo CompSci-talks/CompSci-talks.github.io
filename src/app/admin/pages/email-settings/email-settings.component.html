@@ -1,0 +1,87 @@
+<div class="w-full max-w-4xl mx-auto">
+    <!-- Page header -->
+    <div class="admin-page-header">
+        <h1 class="admin-page-title text-text-main">Email Service Configuration</h1>
+        <p class="admin-page-subtitle text-text-muted">Configure the EmailJS credentials used for sending system emails.
+        </p>
+    </div>
+
+    <div class="admin-card overflow-hidden">
+        <div *ngIf="isLoading" class="p-12 flex flex-col items-center justify-center space-y-4">
+            <div class="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+            <p class="text-text-muted animate-pulse">Loading configuration...</p>
+        </div>
+
+        <form *ngIf="!isLoading" [formGroup]="settingsForm" (ngSubmit)="saveSettings()" class="p-8 space-y-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Service ID -->
+                <div class="space-y-2">
+                    <label for="serviceId" class="block text-sm font-bold text-text-main">EmailJS Service ID</label>
+                    <input id="serviceId" type="text" formControlName="serviceId"
+                        class="w-full px-4 py-3 rounded-xl border border-border bg-surface focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-text-main placeholder:text-text-faint"
+                        placeholder="e.g. service_xxxxxx">
+                    <p class="text-xs text-text-muted mt-1">Found in your EmailJS Dashboard under Email Services.</p>
+                </div>
+
+                <!-- Template ID -->
+                <div class="space-y-2">
+                    <label for="templateId" class="block text-sm font-bold text-text-main">EmailJS Template ID</label>
+                    <input id="templateId" type="text" formControlName="templateId"
+                        class="w-full px-4 py-3 rounded-xl border border-border bg-surface focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-text-main placeholder:text-text-faint"
+                        placeholder="e.g. template_xxxxxx">
+                    <p class="text-xs text-text-muted mt-1">Found in your EmailJS Dashboard under Email Templates.</p>
+                </div>
+
+                <!-- Public Key -->
+                <div class="space-y-2 md:col-span-2">
+                    <label for="publicKey" class="block text-sm font-bold text-text-main">EmailJS Public Key</label>
+                    <input id="publicKey" type="text" formControlName="publicKey"
+                        class="w-full px-4 py-3 rounded-xl border border-border bg-surface focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-text-main placeholder:text-text-faint"
+                        placeholder="e.g. user_xxxxxxxxxxxxxxxx">
+                    <p class="text-xs text-text-muted mt-1">Found in your EmailJS Dashboard under Account — API Keys.
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-primary/5 border border-primary/10 rounded-2xl p-6 flex gap-4">
+                <div class="p-3 bg-primary/10 rounded-xl text-primary h-fit">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="space-y-1">
+                    <h3 class="font-bold text-text-main">Template Variables</h3>
+                    <p class="text-sm text-text-muted leading-relaxed">
+                        Ensure your EmailJS template uses the following variables:
+                        <code
+                            class="px-1.5 py-0.5 bg-surface rounded border border-border font-mono text-xs">{{ '{' }}{{ '{' }}subject{{ '}' }}{{ '}' }}</code>,
+                        <code
+                            class="px-1.5 py-0.5 bg-surface rounded border border-border font-mono text-xs">{{ '{' }}{{ '{' }}message{{ '}' }}{{ '}' }}</code>
+                        (for HTML body),
+                        <code
+                            class="px-1.5 py-0.5 bg-surface rounded border border-border font-mono text-xs">{{ '{' }}{{ '{' }}to_email{{ '}' }}{{ '}' }}</code>,
+                        and
+                        <code
+                            class="px-1.5 py-0.5 bg-surface rounded border border-border font-mono text-xs">{{ '{' }}{{ '{' }}from_name{{ '}' }}{{ '}' }}</code>.
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex justify-end pt-4">
+                <button type="submit" [disabled]="settingsForm.invalid || isSaving"
+                    class="btn btn-primary min-w-[160px] h-12 flex items-center justify-center gap-2">
+                    <svg *ngIf="isSaving" class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                        </circle>
+                        <path class="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                        </path>
+                    </svg>
+                    {{ isSaving ? 'Saving...' : 'Save Configuration' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

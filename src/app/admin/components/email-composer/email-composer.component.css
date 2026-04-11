@@ -1,0 +1,29 @@
+:host {
+    display: block;
+}
+
+/* Premium Quill Editor Overrides */
+::ng-deep .ql-toolbar.ql-snow {
+    border: none;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-muted);
+    padding: 0.75rem;
+}
+
+::ng-deep .ql-container.ql-snow {
+    border: none;
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+::ng-deep .ql-editor {
+    min-height: 250px;
+    padding: 1.5rem;
+    color: var(--text-main);
+}
+
+::ng-deep .ql-editor.ql-blank::before {
+    color: var(--text-inverse-muted);
+    font-style: normal;
+    left: 1.5rem;
+}

@@ -1,0 +1,173 @@
+<div class="container-main section-padding">
+
+
+    @if (isLoading) {
+    <!-- Skeleton -->
+    <div class="animate-pulse">
+        <div class="flex gap-2 mb-4">
+            <div class="h-6 w-16 bg-skeleton rounded-full"></div>
+            <div class="h-6 w-32 bg-skeleton rounded ml-auto"></div>
+        </div>
+        <div class="h-10 w-3/4 bg-skeleton rounded mb-4"></div>
+        <div class="h-6 w-1/2 bg-skeleton rounded mb-8"></div>
+        <div class="h-20 w-full bg-skeleton rounded mb-8 border border-border"></div>
+        <div class="space-y-4 mb-12">
+            <div class="h-4 w-full bg-skeleton rounded"></div>
+            <div class="h-4 w-full bg-skeleton rounded"></div>
+            <div class="h-4 w-5/6 bg-skeleton rounded"></div>
+        </div>
+        <div class="h-64 w-full bg-skeleton rounded mb-8"></div>
+    </div>
+
+    }
+    @else if (seminar) {
+
+    <!-- Hero Thumbnail -->
+    @if (seminar.thumbnail_url) {
+    <div
+        class="w-full h-48 sm:h-[400px] mb-10 rounded-2xl overflow-hidden shadow-lg border border-border bg-surface-muted">
+        <img [src]="seminar.thumbnail_url" [alt]="seminar.title"
+            class="w-full h-full object-cover transition-opacity duration-700" (load)="imageLoaded = true"
+            [class.opacity-0]="!imageLoaded" [class.opacity-100]="imageLoaded">
+    </div>
+    }
+    @else {
+    <div
+        class="relative h-40 w-full mb-8 rounded-2xl border-2 border-dashed border-border bg-surface-muted flex items-center justify-center">
+        <div class="text-center text-text-muted">
+            <svg class="w-10 h-10 mx-auto mb-2 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <p class="text-sm">No thumbnail uploaded</p>
+        </div>
+    </div>
+    }
+
+    <div class="mb-6">
+        <div class="flex flex-col gap-4 mb-4">
+            <!-- Tags Row -->
+            <div class="flex flex-wrap gap-2">
+                @for (tag of seminar.tags; track tag.id) {
+                <span class="text-white text-xs sm:text-sm font-semibold px-3 py-1 rounded-full whitespace-nowrap"
+                    [style.backgroundColor]="tag.color_code">
+                    {{ tag.name }}
+                </span>
+                } @empty {
+                @for (tagId of seminar.tag_ids; track tagId) {
+                <span
+                    class="bg-primary-light text-primary text-xs sm:text-sm font-semibold px-3 py-1 rounded-full whitespace-nowrap">
+                    {{ tagId }}
+                </span>
+                }
+                }
+            </div>
+
+            <!-- Date & Status Row -->
+            <div class="flex flex-wrap items-center gap-3">
+                <span class="text-text-muted text-sm sm:text-base flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    {{ seminar.date_time | date:'fullDate' }} at {{ seminar.date_time | date:'shortTime' }}
+                    @if (seminar.duration) {
+                    <span class="mx-1 text-text-faint">•</span>
+                    {{ seminar.duration | duration }}
+                    }
+                </span>
+
+                @switch (seminar.date_time | seminarStatus) {
+                @case ('live') {
+                <span
+                    class="bg-status-error text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded animate-pulse">
+                    LIVE NOW
+                </span>
+                }
+                @case ('soon') {
+                <span class="bg-status-warning text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded">
+                    STARTING SOON
+                </span>
+                }
+                }
+            </div>
+        </div>
+
+        <h1 class="text-2xl sm:text-4xl font-bold text-text-main mb-2">{{ seminar.title }}</h1>
+        <p class="text-lg text-text-muted mb-6">
+            Presented by:
+            @if (seminar.speakers?.length) {
+            {{ getSpeakerNames(seminar.speakers) }}
+            } @else {
+            {{ seminar.speaker_ids.join(', ') || 'TBA' }}
+            }
+        </p>
+
+        <div class="bg-surface-card p-4 rounded-lg flex items-center justify-between mb-8 border border-border">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span class="font-medium text-text-main">{{ seminar.location }}</span>
+            </div>
+            @if (isUpcoming) {
+            <app-rsvp-button [seminar]="seminar"></app-rsvp-button>
+            }
+        </div>
+    </div>
+
+    <!-- Abstract -->
+    <div class="prose max-w-none mb-12 text-text-main" [innerHTML]="seminar.abstract | markdown"></div>
+
+    <!-- Materials section -->
+    @if (isAuthenticated$ | async) {
+    @if (seminar.video_material_id || seminar.presentation_material_id) {
+    <div class="space-y-8 mb-12">
+        @if (seminar.video_material_id) {
+        <div>
+            <h3 class="text-xl font-bold mb-4">Seminar Recording</h3>
+            <app-video-player [videoId]="seminar.video_material_id"></app-video-player>
+        </div>
+        }
+        @if (seminar.presentation_material_id) {
+        <div>
+            <h3 class="text-xl font-bold mb-4">Presentation Slides</h3>
+            <app-slide-viewer [presentationId]="seminar.presentation_material_id"></app-slide-viewer>
+        </div>
+        }
+    </div>
+    } @else {
+    <div class="card p-8 text-center bg-surface-muted border-dashed border-2 border-border mb-8">
+        <h3 class="text-xl font-bold mb-2">Materials Not Yet Available</h3>
+        <p class="text-text-muted">The speakers have not uploaded the video or slides for this seminar yet.</p>
+    </div>
+    }
+    } @else {
+    <div class="card p-8 text-center bg-surface-muted border-dashed border-2 border-border mb-8">
+        <h3 class="text-xl font-bold mb-2">Seminar Materials</h3>
+        <p class="text-text-muted mb-4">Video recording and presentation slides are available to registered attendees.
+        </p>
+        <a routerLink="/login" [queryParams]="{ returnUrl: '/seminar/' + seminar.id }" class="btn btn-outline">
+            Log in to view
+        </a>
+    </div>
+    }
+
+    <!-- Comments Section -->
+    <div class="mt-12">
+        <app-comments-container [seminar_title]="seminar.title" [seminarId]="seminar.id"></app-comments-container>
+    </div>
+
+    } @else {
+    <!-- Not Found -->
+    <div class="py-12 text-center">
+        <h2 class="text-2xl font-bold text-text-main">Seminar not found</h2>
+        <p class="text-text-muted mt-2">The seminar you are looking for does not exist or has been removed.</p>
+        <a routerLink="/" class="btn btn-primary mt-6">Return Home</a>
+    </div>
+    }
+
+</div>

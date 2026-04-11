@@ -1,0 +1,72 @@
+<div
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-footer/60 backdrop-blur-sm animate-in fade-in duration-300">
+    <div
+        class="bg-surface w-full max-w-4xl max-h-[90vh] rounded-3xl shadow-2xl border border-border flex flex-col overflow-hidden animate-in zoom-in-95 duration-300">
+
+        <!-- Modal Header -->
+        <header class="p-6 border-b border-border flex items-center justify-between bg-surface-muted/30">
+            <div>
+                <h2 class="text-xl font-extrabold text-text-main tracking-tight">Compose Email</h2>
+                <p class="text-sm text-text-muted mt-1">Sending to {{ recipients.length }} recipients</p>
+            </div>
+            <button (click)="onClose.emit()"
+                class="p-2 hover:bg-status-error/10 hover:text-status-error rounded-xl transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 6 6 18" />
+                    <path d="m6 6 12 12" />
+                </svg>
+            </button>
+        </header>
+
+        <!-- Modal Body -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-6">
+            <!-- Recipients Chip List -->
+            <div>
+                <label class="block text-sm font-semibold text-text-main mb-2">Recipients</label>
+                <div class="flex flex-wrap gap-2 p-3 rounded-xl border border-border bg-surface-muted/20 min-h-[46px]">
+                    <div *ngFor="let r of recipients.slice(0, 10)"
+                        class="bg-admin/10 text-admin text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1">
+                        {{ r.display_name }}
+                    </div>
+                    <div *ngIf="recipients.length > 10" class="text-text-muted text-xs font-medium self-center px-1">
+                        +{{ recipients.length - 10 }} more
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subject -->
+            <div>
+                <label for="subject" class="block text-sm font-semibold text-text-main mb-2">Subject</label>
+                <input type="text" id="subject" [(ngModel)]="subject" placeholder="Enter email subject..."
+                    class="w-full px-4 py-3 rounded-xl border border-border focus:ring-2 focus:ring-admin/20 focus:border-admin outline-none transition-all placeholder:text-text-inverse-muted">
+            </div>
+
+            <!-- Editor -->
+            <div class="flex flex-col flex-1 min-h-[300px]">
+                <label class="block text-sm font-semibold text-text-main mb-2">Message</label>
+                <quill-editor [(ngModel)]="body" [modules]="quillConfig" placeholder="Compose your message here..."
+                    class="flex-1 rounded-xl overflow-hidden border border-border focus-within:ring-2 focus-within:ring-admin/20 focus-within:border-admin transition-all"></quill-editor>
+            </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <footer class="p-6 border-t border-border bg-surface-muted/30 flex justify-end gap-3">
+            <button (click)="onClose.emit()"
+                class="px-6 py-3 rounded-xl font-bold text-text-muted hover:bg-surface-muted transition-colors">
+                Cancel
+            </button>
+            <button (click)="sendEmail()" [disabled]="isSending || !subject || !body || recipients.length === 0"
+                class="bg-admin hover:bg-admin-hover text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 focus:ring-4 focus:ring-admin/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center gap-2">
+                <svg *ngIf="isSending" class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg"
+                    fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                </svg>
+                {{ isSending ? 'Sending...' : 'Send Email' }}
+            </button>
+        </footer>
+    </div>
+</div>

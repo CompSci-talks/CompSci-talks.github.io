@@ -1,0 +1,37 @@
+<ng-container *ngIf="isAuthenticated$ | async; else guestLayout">
+    <ng-container *ngIf="isAttending$ | async as attending; else notAttending">
+        <!-- Attending State -->
+        <div class="flex items-center gap-3">
+            <a [href]="calendarLink" target="_blank" rel="noopener noreferrer"
+                class="btn btn-outline text-text-muted hover:text-text-main py-1 px-3 text-sm">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                    </path>
+                </svg>
+                Add to Calendar
+            </a>
+            <button (click)="toggleRsvp(true)" [disabled]="isLoading"
+                class="btn bg-green-100 text-green-800 hover:bg-green-200 border border-green-200">
+                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                {{ isLoading ? 'Updating...' : 'Attending' }}
+            </button>
+        </div>
+    </ng-container>
+
+    <ng-template #notAttending>
+        <!-- Not Attending State -->
+        <button (click)="toggleRsvp(false)" [disabled]="isLoading" class="btn btn-primary">
+            {{ isLoading ? 'Updating...' : 'Mark as Attending' }}
+        </button>
+    </ng-template>
+</ng-container>
+
+<ng-template #guestLayout>
+    <button (click)="redirectToLogin()" class="btn btn-primary opacity-50 cursor-not-allowed hidden md:inline-flex"
+        title="Login Required">
+        Mark as Attending (Login Required)
+    </button>
+</ng-template>

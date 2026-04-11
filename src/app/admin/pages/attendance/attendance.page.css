@@ -1,0 +1,4 @@
+/* Attendance page styles - predominantly Tailwind */
+:host {
+    display: block;
+}

@@ -1,0 +1,96 @@
+<div class="min-h-screen pt-24 pb-12 px-4 bg-background flex items-center justify-center">
+
+    <!-- Background -->
+    <div class="absolute top-0 right-0 -z-10 w-96 h-96 bg-primary/10 rounded-full blur-3xl opacity-30"></div>
+    <div class="absolute bottom-0 left-0 -z-10 w-96 h-96 bg-secondary/10 rounded-full blur-3xl opacity-30"></div>
+
+    <div class="w-full max-w-md animate-in fade-in slide-in-from-bottom-4 duration-700">
+
+        <div class="glass-card p-8 md:p-10 text-center relative overflow-hidden">
+
+            <!-- Icon -->
+            <div class="w-20 h-20 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-8 relative">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+            </div>
+
+            <!-- Title -->
+            <h1 class="text-3xl font-bold text-text-primary mb-4">
+                {{ isVerifyingDirectly ? 'Verifying your email...' : 'Verify your email' }}
+            </h1>
+
+            <!-- Description -->
+            <p class="text-text-secondary mb-8 leading-relaxed">
+                {{ isVerifyingDirectly
+                ? 'Please wait while we confirm your account...'
+                : "We've sent a verification link to your email address. Please click the link to confirm your account."
+                }}
+            </p>
+
+            <!-- Loading during direct verification -->
+            <div *ngIf="isVerifyingDirectly" class="text-center py-6">
+                <svg class="animate-spin h-8 w-8 mx-auto mb-3" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"
+                        fill="none"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z">
+                    </path>
+                </svg>
+            </div>
+
+            <!-- Email -->
+            <div *ngIf="user$ | async as user"
+                class="p-3 bg-background-alt/50 rounded-lg border border-border mb-6 inline-block px-6">
+                <span class="text-primary font-medium">{{ user.email }}</span>
+            </div>
+
+            <!-- Spam Notice -->
+            <div class="mb-8 p-4 bg-secondary/5 rounded-xl border border-secondary/10 text-left">
+                <p class="text-sm">
+                    <strong>Can't find the email?</strong><br>
+                    Check your Spam or Junk folder.
+                </p>
+            </div>
+
+            <!-- Actions -->
+            <div class="space-y-4" *ngIf="!isVerifyingDirectly">
+
+                <button (click)="checkVerificationStatus()" [disabled]="isChecking"
+                    class="btn-primary w-full py-4 text-base">
+
+                    <span class="flex items-center justify-center gap-2">
+                        <svg *ngIf="isChecking" class="animate-spin h-5 w-5" viewBox="0 0 24 24"></svg>
+                        {{ isChecking ? 'Checking...' : 'I have verified my email' }}
+                    </span>
+                </button>
+
+                <button (click)="resendVerification()" [disabled]="isResending || resendCooldown > 0"
+                    class="btn-secondary w-full py-4 text-base">
+
+                    <span class="flex items-center justify-center gap-2">
+                        {{ isResending
+                        ? 'Sending...'
+                        : (resendCooldown > 0
+                        ? 'Resend in ' + resendCooldown + 's'
+                        : 'Resend verification link') }}
+                    </span>
+                </button>
+            </div>
+
+            <!-- Logout -->
+            <div class="mt-10 pt-8 border-t border-border/50">
+                <button (click)="logout()" class="text-sm text-text-muted hover:text-primary">
+                    Sign out and use another account
+                </button>
+            </div>
+
+        </div>
+
+        <p class="text-center mt-8 text-text-muted text-sm">
+            Didn't receive the email? Wait a bit or resend it.
+        </p>
+
+    </div>
+</div>

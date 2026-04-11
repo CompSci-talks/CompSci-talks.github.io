@@ -1,0 +1,77 @@
+<div class="space-y-4">
+    <div *ngFor="let s of submissions"
+        class="group relative flex items-start gap-6 p-6 rounded-xl transition-all duration-300 border border-transparent hover:border-gallery-outline-variant/30 shadow-sm cursor-pointer"
+        [ngClass]="{
+            'bg-gallery-primary/[0.05]': s.status === 'new',
+            'bg-gallery-surface-container-lowest hover:bg-gallery-surface-container-low': s.status !== 'new'
+        }" (click)="view.emit(s)">
+
+        <!-- Status Indicator -->
+        <div class="flex items-center gap-4 mt-1 shrink-0">
+            <div [ngClass]="{
+                'bg-gallery-primary h-2.5 w-2.5 ring-4 ring-gallery-primary/10': s.status === 'new',
+                'bg-transparent h-2.5 w-2.5': s.status !== 'new'
+            }" class="rounded-full"></div>
+            <input
+                class="rounded border-gallery-outline-variant text-gallery-primary focus:ring-gallery-primary w-4 h-4 cursor-pointer"
+                type="checkbox" (click)="$event.stopPropagation()" />
+        </div>
+
+        <div class="grid grid-cols-12 gap-4 flex-1 items-center">
+            <!-- Sender Info -->
+            <div class="col-span-3">
+                <h4 class="font-bold text-gallery-on-surface truncate">{{ s.name || '(Anonymous)' }}</h4>
+                <p class="text-xs text-gallery-on-surface-variant font-medium mt-0.5 truncate">{{ s.email || '(No email
+                    provided)' }}</p>
+            </div>
+
+            <!-- Content Preview -->
+            <div class="col-span-7 pr-8">
+                <div class="flex items-center gap-3 mb-1">
+                    <span [ngClass]="{
+                        'bg-gallery-tertiary/10 text-gallery-tertiary': s.subject === 'Bug Report',
+                        'bg-gallery-secondary-container text-gallery-on-secondary-container': s.subject === 'General Feedback',
+                        'bg-gallery-primary/10 text-gallery-primary': s.subject === 'Speaker Suggestion',
+                        'bg-gallery-surface-variant text-gallery-on-surface-variant': s.subject === 'Other'
+                    }" class="text-[10px] px-2 py-0.5 font-bold rounded uppercase tracking-wider">
+                        {{ s.subject }}
+                    </span>
+                    <span class="text-xs text-gallery-on-surface-variant/60 font-medium">
+                        {{ (s.createdAt?.toDate ? s.createdAt.toDate() : s.createdAt) | date:'MMM d, HH:mm' }}
+                    </span>
+                </div>
+                <p class="text-sm text-gallery-on-surface-variant line-clamp-1 leading-relaxed">
+                    {{ s.message }}
+                </p>
+            </div>
+
+            <!-- Contextual Actions -->
+            <div class="col-span-2 flex justify-end items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <button (click)="$event.stopPropagation(); reply.emit(s)"
+                    class="flex items-center gap-2 bg-gradient-to-r from-gallery-primary to-gallery-primary-container text-white px-5 py-2 rounded-lg text-sm font-semibold shadow-lg shadow-gallery-primary/20 active:scale-95 transition-all">
+                    <span class="material-symbols-outlined text-sm">reply</span>
+                    Reply
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pagination Footer (Simplified for current view) -->
+<div class="flex items-center justify-between py-8">
+    <p class="text-sm text-gallery-on-surface-variant font-medium">
+        Showing <span class="font-bold text-gallery-on-surface">{{ submissions.length }}</span> entries
+    </p>
+    <div class="flex gap-2">
+        <button
+            class="p-2 bg-gallery-surface-container rounded-lg hover:bg-gallery-surface-container-high transition-colors disabled:opacity-20"
+            disabled>
+            <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+        <button
+            class="p-2 bg-gallery-surface-container rounded-lg hover:bg-gallery-surface-container-high transition-colors disabled:opacity-20"
+            disabled>
+            <span class="material-symbols-outlined">chevron_right</span>
+        </button>
+    </div>
+</div>

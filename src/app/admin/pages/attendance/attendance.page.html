@@ -1,0 +1,228 @@
+<div class="w-full">
+
+  <!-- Page header -->
+  <div class="admin-page-header">
+    <div class="flex items-center gap-2 text-sm text-text-muted mb-2">
+      <a routerLink="/admin/seminars" class="hover:text-admin transition-colors font-medium">Seminar Scheduling</a>
+      <span>/</span>
+      <span class="font-semibold text-text-main">Attendance</span>
+    </div>
+    <h1 class="admin-page-title">
+      {{ seminar?.title || 'Seminar Attendance' }}
+    </h1>
+    <p class="admin-page-subtitle">
+      Manage and view all participants who have marked attendance for this session.
+    </p>
+  </div>
+
+  <!-- Filters & Actions -->
+  <div class="admin-card p-6 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+      <div class="lg:col-span-2">
+        <label for="search" class="block text-sm font-medium text-text-main mb-2">Search Attendees</label>
+        <div class="relative">
+          <input type="text" id="search" [(ngModel)]="filters.searchQuery" (ngModelChange)="applyFilters()"
+            placeholder="Filter by name or email..." class="input-field pl-10">
+          <div class="absolute left-3 top-1/2 -translate-y-1/2 text-text-faint">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.3-4.3" />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <label for="status" class="block text-sm font-medium text-text-main mb-2">Status</label>
+        <select id="status" [(ngModel)]="filters.status" (ngModelChange)="applyFilters()"
+          class="input-field appearance-none">
+          <option [ngValue]="undefined">All Statuses</option>
+          <option value="pending">Pending</option>
+          <option value="attended">Attended</option>
+          <option value="no_show">No Show</option>
+        </select>
+      </div>
+
+      <div>
+        <button [disabled]="selectedAttendeeIds.size === 0" (click)="openComposer()"
+          class="btn btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed">
+          Send Email
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Attendance Table -->
+  <div class="admin-card overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-surface-muted/50 border-b border-border">
+            <th class="px-6 py-4">
+              <input type="checkbox" [checked]="isAllSelected()" (change)="toggleAll(headerCheck.checked)" #headerCheck
+                class="rounded border-border text-admin focus:ring-admin">
+            </th>
+            <th class="th-cell">Attendee</th>
+            <th class="th-cell">Status</th>
+            <th class="th-cell">Marked Date</th>
+            <th class="th-cell">Actions</th>
+          </tr>
+        </thead>
+
+        <!-- Loading skeleton -->
+        <tbody *ngIf="isLoading" class="divide-y divide-border">
+          <tr *ngFor="let i of [1,2,3,4,5]" class="animate-pulse">
+            <td class="px-6 py-4">
+              <div class="w-4 h-4 rounded bg-skeleton mx-auto"></div>
+            </td>
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-skeleton"></div>
+                <div class="space-y-2">
+                  <div class="w-32 h-4 bg-skeleton rounded"></div>
+                  <div class="w-24 h-3 bg-skeleton rounded"></div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4">
+              <div class="w-20 h-6 bg-skeleton rounded-full"></div>
+            </td>
+            <td class="px-6 py-4">
+              <div class="w-28 h-4 bg-skeleton rounded"></div>
+            </td>
+            <td class="px-6 py-4">
+              <div class="w-8 h-8 bg-skeleton rounded-lg"></div>
+            </td>
+          </tr>
+        </tbody>
+
+        <!-- Data -->
+        <tbody *ngIf="!isLoading" class="divide-y divide-border">
+          <tr *ngFor="let attendee of filteredAttendees" class="hover:bg-surface-muted/30 transition-colors">
+            <td class="px-6 py-4 text-center">
+              <input type="checkbox" [checked]="isSelected(attendee.id)" (change)="toggleAttendee(attendee.id)"
+                class="rounded border-border text-admin focus:ring-admin">
+            </td>
+            <td class="px-6 py-4">
+              <a [routerLink]="['/admin/user', attendee.id]" class="flex items-center gap-3 group">
+                <div
+                  class="w-10 h-10 rounded-full bg-admin/10 flex items-center justify-center text-admin font-bold text-lg flex-shrink-0 group-hover:ring-2 group-hover:ring-admin/30 transition-all">
+                  {{ attendee.display_name.charAt(0) }}
+                </div>
+                <div>
+                  <div class="text-sm font-bold text-text-main group-hover:text-admin transition-colors">{{
+                    attendee.display_name }}</div>
+                  <div class="text-xs text-text-muted">{{ attendee.email }}</div>
+                </div>
+              </a>
+            </td>
+            <td class="px-6 py-4">
+              <span [ngClass]="{
+                'bg-status-success/10 text-status-success': attendee.status === 'attended',
+                'bg-amber-500/10 text-amber-500': attendee.status === 'pending' || attendee.status === 'confirmed',
+                'bg-status-error/10 text-status-error': attendee.status === 'no_show'
+              }" class="px-3 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full" [ngClass]="{
+                  'bg-status-success': attendee.status === 'attended',
+                  'bg-amber-500': attendee.status === 'pending' || attendee.status === 'confirmed',
+                  'bg-status-error': attendee.status === 'no_show'
+                }"></span>
+                <ng-container [ngSwitch]="attendee.status">
+                  <span *ngSwitchCase="'pending'">Pending</span>
+                  <span *ngSwitchCase="'confirmed'">Pending</span>
+                  <span *ngSwitchCase="'attended'">Attended</span>
+                  <span *ngSwitchCase="'no_show'">No Show</span>
+                </ng-container>
+              </span>
+            </td>
+            <td class="px-6 py-4 text-sm text-text-main">
+              {{ attendee.marked_at | date:'MMM d, y, h:mm a' }}
+            </td>
+            <td class="px-6 py-4">
+              <button (click)="openStatusModal(attendee)" title="Update status"
+                class="p-2 text-text-muted hover:text-admin transition-colors rounded-lg hover:bg-admin/5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                  <path d="m15 5 4 4" />
+                </svg>
+              </button>
+            </td>
+          </tr>
+
+          <!-- Empty state -->
+          <tr *ngIf="filteredAttendees.length === 0">
+            <td colspan="5" class="px-6 py-12 text-center text-text-muted">
+              <div class="flex flex-col items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                  class="text-border">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                <p class="font-medium">No attendees found matching your filters.</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============================================================ -->
+<!-- Status Update Modal                                          -->
+<!-- ============================================================ -->
+<app-modal *ngIf="statusModalAttendee" [title]="'Update Attendance Status'"
+  [subtitle]="statusModalAttendee.display_name + ' · ' + statusModalAttendee.email" (close)="closeStatusModal()">
+
+  <div body class="space-y-3">
+    <p class="text-sm text-text-muted mb-4">Select a new status for this attendee:</p>
+
+    <label *ngFor="let option of statusOptions"
+      class="flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all" [ngClass]="tempStatus === option.value
+        ? 'border-admin bg-admin/5'
+        : 'border-border hover:border-border-focus hover:bg-surface-muted/40'">
+      <input type="radio" [value]="option.value" [(ngModel)]="tempStatus" class="sr-only">
+      <!-- Custom radio dot -->
+      <div class="w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all"
+        [ngClass]="tempStatus === option.value ? 'border-admin' : 'border-border'">
+        <div *ngIf="tempStatus === option.value" class="w-2.5 h-2.5 rounded-full bg-admin"></div>
+      </div>
+      <!-- Status badge + label -->
+      <div class="flex items-center gap-2 flex-1">
+        <span class="w-2 h-2 rounded-full flex-shrink-0" [ngClass]="option.dot"></span>
+        <div>
+          <div class="font-semibold text-sm text-text-main">{{ option.label }}</div>
+          <div class="text-xs text-text-muted mt-0.5">{{ option.description }}</div>
+        </div>
+      </div>
+      <!-- Current badge -->
+      <span *ngIf="statusModalAttendee.status === option.value"
+        class="text-xs font-medium px-2 py-0.5 rounded-full bg-surface-muted text-text-muted">
+        Current
+      </span>
+    </label>
+  </div>
+
+  <div footer class="flex gap-3 mt-2">
+    <button (click)="closeStatusModal()" class="btn btn-secondary flex-1">
+      Cancel
+    </button>
+    <button (click)="saveAttendeeStatus()" [disabled]="isSavingStatus || tempStatus === statusModalAttendee.status"
+      class="btn btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed">
+      <span *ngIf="!isSavingStatus">Save Changes</span>
+      <span *ngIf="isSavingStatus" class="flex items-center justify-center gap-2">
+        <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+        </svg>
+        Saving...
+      </span>
+    </button>
+  </div>
+
+</app-modal>

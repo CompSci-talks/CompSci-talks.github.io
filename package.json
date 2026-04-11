@@ -1,0 +1,53 @@
+{
+  "name": "compsci-talks",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "deploy": "ng build --output-path=dist/Dev --base-href=/Dev/ && npx angular-cli-ghpages --dir=dist/Dev/browser"
+  },
+  "private": true,
+  "packageManager": "npm@11.3.0",
+  "dependencies": {
+    "@angular/animations": "^21.2.4",
+    "@angular/common": "^21.2.4",
+    "@angular/compiler": "^21.2.4",
+    "@angular/core": "^21.2.4",
+    "@angular/fire": "^20.0.1",
+    "@angular/forms": "^21.2.4",
+    "@angular/platform-browser": "^21.2.4",
+    "@angular/router": "^21.2.4",
+    "@emailjs/browser": "^4.4.1",
+    "@supabase/supabase-js": "^2.99.1",
+    "@tailwindcss/typography": "^0.5.19",
+    "dompurify": "^3.3.3",
+    "firebase": "^11.10.0",
+    "firebase-admin": "^13.7.0",
+    "marked": "^17.0.5",
+    "ngx-quill": "^30.0.1",
+    "quill": "^2.0.3",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "zone.js": "^0.16.1"
+  },
+  "devDependencies": {
+    "@angular/build": "^21.2.2",
+    "@angular/cli": "^21.2.2",
+    "@angular/compiler-cli": "^21.2.4",
+    "@cucumber/cucumber": "^11.2.0",
+    "@playwright/test": "^1.58.2",
+    "@types/dompurify": "^3.0.5",
+    "angular-cli-ghpages": "^3.0.2",
+    "autoprefixer": "^10.4.27",
+    "jsdom": "^28.0.0",
+    "playwright-core": "^1.50.1",
+    "postcss": "^8.5.8",
+    "prettier": "^3.8.1",
+    "tailwindcss": "^3.4.19",
+    "typescript": "~5.9.2",
+    "vitest": "^4.0.8"
+  }
+}

@@ -1,0 +1,22 @@
+<div class="container-main section-padding">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-text-main mb-2">Talks Archive</h1>
+        <p class="text-text-muted">Browse past talks and materials.</p>
+    </div>
+
+    <div class="mb-12">
+        <!-- <input type="text" placeholder="Search by keyword, tag, or speaker..." class="input-field max-w-md" disabled
+            title="Search interaction to be implemented"> -->
+    </div>
+
+    <app-paginated-grid [data]="seminars" [loading]="loading" [itemTemplate]="seminarTmpl"
+        [skeletonTemplate]="skeletonTmpl" emptyMessage="No past seminars found." [showPagination]="false">
+        <ng-template #seminarTmpl let-sem>
+            <app-seminar-card [seminar]="sem"></app-seminar-card>
+        </ng-template>
+
+        <ng-template #skeletonTmpl>
+            <app-skeleton-card *ngFor="let i of [1,2,3,4,5,6]"></app-skeleton-card>
+        </ng-template>
+    </app-paginated-grid>
+</div>

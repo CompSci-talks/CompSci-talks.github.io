@@ -1,0 +1,57 @@
+<div class="fixed top-6 right-6 z-[70] flex flex-col gap-3 pointer-events-auto max-w-[calc(100vw-3rem)] sm:max-w-md">
+    <!-- Flowbite-styled Glassmorphic Toast with Angular Animations -->
+    <div *ngFor="let toast of toasts$ | async" id="toast-{{toast.id}}" @fade role="alert"
+        class="flex items-center w-full max-w-xs p-4 text-body bg-neutral-primary-soft rounded-base shadow-lg border border-default"
+        [ngClass]="{
+          'border-status-success/30': toast.type === 'success',
+          'border-status-error/30': toast.type === 'error',
+          'border-amber-500/30': toast.type === 'warning',
+          'border-border': toast.type === 'info'
+        }">
+
+        <!-- Icon -->
+        <div class="shrink-0">
+            <!-- Success Icon -->
+            <svg *ngIf="toast.type === 'success'" class="w-6 h-6 text-status-success" aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M5 11.917 9.724 16.5 19 7.5" />
+            </svg>
+            <!-- Error Icon -->
+            <svg *ngIf="toast.type === 'error'" class="w-6 h-6 text-status-error" aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M6 18 17.94 6M18 18 6.06 6" />
+            </svg>
+            <!-- Warning Icon -->
+            <svg *ngIf="toast.type === 'warning'" class="w-6 h-6 text-amber-500" aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 13V8m0 8h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
+            <!-- Info Icon -->
+            <svg *ngIf="toast.type === 'info'" class="w-6 h-6 text-primary" aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        </div>
+
+        <!-- Message Container (Flowbite Style Border-S) -->
+        <div class="ms-3 text-sm font-medium text-text-main border-s border-border ps-4 flex-grow">
+            {{ toast.message }}
+        </div>
+
+        <!-- Close Button -->
+        <button (click)="remove(toast)" type="button"
+            class="ms-2 -mx-1.5 -my-1.5 flex items-center justify-center text-text-muted hover:text-text-main hover:bg-black/5 rounded-lg focus:ring-2 focus:ring-primary/20 p-1.5 h-8 w-8 transition-colors"
+            [attr.aria-label]="'Close ' + toast.type + ' message'">
+            <span class="sr-only">Close</span>
+            <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                    d="M6 18 17.94 6M18 18 6.06 6" />
+            </svg>
+        </button>
+    </div>
+</div>

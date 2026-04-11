@@ -1,0 +1,95 @@
+<div class="min-h-[80vh] flex items-center justify-center px-4 py-8">
+    <!-- Success State Container -->
+    <div *ngIf="isSuccess"
+        class="card w-full max-w-lg p-8 flex flex-col items-center justify-center text-center space-y-6">
+        <div
+            class="w-16 h-16 rounded-full bg-primary/20 text-primary flex items-center justify-center border border-primary/30">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+        </div>
+        <div>
+            <h2 class="text-2xl font-bold text-text-main mb-2">Message Sent!</h2>
+            <p class="text-text-muted text-sm">Thanks for reaching out. We will review your message shortly.</p>
+        </div>
+        <button type="button" (click)="resetForm()" class="btn btn-primary w-full mt-6">
+            Send another message
+        </button>
+    </div>
+
+    <!-- Form Container -->
+    <div *ngIf="!isSuccess" class="card w-full max-w-lg p-8">
+        <div class="text-center mb-8">
+            <h1 class="text-2xl font-bold text-text-main">Contact Us</h1>
+            <p class="text-text-muted mt-2 text-sm">Have questions or feedback? We'd love to hear from you.</p>
+        </div>
+
+        <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="space-y-4">
+            <!-- Name -->
+            <div>
+                <label for="name" class="block text-sm font-medium text-text-main mb-1">Name <span
+                        class="text-xs font-normal text-text-muted ml-1">(Optional)</span></label>
+                <input type="text" id="name" formControlName="name" class="input-field w-full" placeholder="Your Name">
+            </div>
+
+            <!-- Email -->
+            <div>
+                <label for="email" class="block text-sm font-medium text-text-main mb-1">Email <span
+                        class="text-xs font-normal text-text-muted ml-1">(Optional)</span></label>
+                <input type="email" id="email" formControlName="email" class="input-field w-full"
+                    placeholder="you@example.com">
+                <div *ngIf="contactForm.get('email')?.touched && contactForm.get('email')?.invalid"
+                    class="text-status-error text-sm mt-1">
+                    <span *ngIf="contactForm.get('email')?.errors?.['email']">Please enter a valid email address.</span>
+                </div>
+            </div>
+
+            <!-- Subject -->
+            <div>
+                <label for="subject" class="block text-sm font-medium text-text-main mb-1">Subject</label>
+                <select id="subject" formControlName="subject" class="input-field w-full appearance-none">
+                    <option value="General Feedback">General Feedback</option>
+                    <option value="Bug Report">Bug Report</option>
+                    <option value="Speaker Suggestion">Speaker Suggestion</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <!-- Message -->
+            <div>
+                <div class="flex justify-between items-baseline mb-1">
+                    <label for="message" class="block text-sm font-medium text-text-main">Message</label>
+                    <span class="text-xs"
+                        [ngClass]="{'text-status-error': messageLength > 1000, 'text-text-muted': messageLength <= 1000}">
+                        {{messageLength}} / 1000
+                    </span>
+                </div>
+                <textarea id="message" formControlName="message" rows="5"
+                    class="input-field w-full resize-y min-h-[120px]" placeholder="How can we help?"
+                    maxlength="1000"></textarea>
+                <div *ngIf="contactForm.get('message')?.touched && contactForm.get('message')?.invalid"
+                    class="text-status-error text-sm mt-1">
+                    <span *ngIf="contactForm.get('message')?.errors?.['required']">Message is required.</span>
+                    <span *ngIf="contactForm.get('message')?.errors?.['minlength']">Message must be at least 20
+                        characters long.</span>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" [disabled]="contactForm.invalid || isLoading" class="btn btn-primary w-full mt-6">
+                <span *ngIf="!isLoading">Send Message</span>
+                <span *ngIf="isLoading" class="flex items-center justify-center">
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg"
+                        fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                        </circle>
+                        <path class="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                        </path>
+                    </svg>
+                    Sending...
+                </span>
+            </button>
+        </form>
+    </div>
+</div>

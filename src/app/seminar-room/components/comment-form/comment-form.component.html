@@ -1,0 +1,15 @@
+<form (ngSubmit)="onSubmit()" class="mt-4 flex flex-col gap-2 relative">
+    <textarea [(ngModel)]="newCommentText" name="commentText" rows="3"
+        [placeholder]="isReply ? 'Write a reply...' : 'Leave a comment or ask a question...'"
+        class="input-field resize-none w-full" required [disabled]="isSubmitting">
+    </textarea>
+    <div class="flex justify-end gap-2 mt-1">
+        <button *ngIf="isReply" type="button" class="btn btn-ghost text-sm" (click)="cancelReply.emit()"
+            [disabled]="isSubmitting">
+            Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="!newCommentText.trim() || isSubmitting">
+            {{ isSubmitting ? 'Posting...' : (isReply ? 'Reply' : 'Post Comment') }}
+        </button>
+    </div>
+</form>
