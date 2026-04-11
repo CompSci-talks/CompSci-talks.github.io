@@ -47,7 +47,7 @@
 
             <!-- Contextual Actions -->
             <div class="col-span-2 flex justify-end items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <button (click)="$event.stopPropagation(); reply.emit(s)"
+                <button [disabled]="!s.email" (click)="$event.stopPropagation(); reply.emit(s)"
                     class="flex items-center gap-2 bg-gradient-to-r from-gallery-primary to-gallery-primary-container text-white px-5 py-2 rounded-lg text-sm font-semibold shadow-lg shadow-gallery-primary/20 active:scale-95 transition-all">
                     <span class="material-symbols-outlined text-sm">reply</span>
                     Reply
