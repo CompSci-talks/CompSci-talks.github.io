@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "deploy": "ng build --output-path=dist/Dev --base-href=/Dev/ && npx angular-cli-ghpages --dir=dist/Dev/browser"
+    "deploy": "ng build --output-path=dist/browser --base-href=/ && npx angular-cli-ghpages --dir=dist/browser"
   },
   "private": true,
   "packageManager": "npm@11.3.0",
