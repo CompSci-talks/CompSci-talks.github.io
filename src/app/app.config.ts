@@ -34,7 +34,7 @@ import { FirebaseStorageService } from './firebase-adapters/firebase-storage.ser
 import { VercelMailService } from './core/services/vercel-mail-service';
 import { CONTACT_SUBMISSION_SERVICE } from './core/contracts/contact-submission.interface';
 import { FirebaseContactSubmissionService } from './firebase-adapters/firebase-contact-submission.service';
-
+import { provideAnalytics, getAnalytics } from '@angular/fire/analytics';
 // No activity service yet, but let's assume we'll use a mock or similar soon, 
 // for now let's only provide USER_SERVICE if we haven't created the other implementation.
 // Actually T020 says FirebaseUserActivityService, but I haven't written it.
@@ -74,5 +74,6 @@ export const appConfig: ApplicationConfig = {
         ]
       }
     }),
+    provideAnalytics(() => getAnalytics()),
   ]
 };
