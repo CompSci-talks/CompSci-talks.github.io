@@ -1,0 +1,1 @@
+import{kb as e}from"./chunk-EFJLJBH3.js";var o=class i{transform(r){if(!r)return"60 min";if(r<60)return`${r} min`;let n=Math.floor(r/60),t=r%60;return t===0?`${n} hr${n>1?"s":""}`:`${n} hr${n>1?"s":""} ${t} min`}static \u0275fac=function(n){return new(n||i)};static \u0275pipe=e({name:"duration",type:i,pure:!0})};export{o as a};

@@ -1,1 +1,0 @@
-import{kb as i}from"./chunk-EWB43LG3.js";var o=class r{transform(e){let n=e instanceof Date?e.getTime():e,p=Date.now(),t=n-p;return t<-54e5?"past":t<=0&&t>=-54e5?"live":t>0&&t<=9e5?"soon":"upcoming"}static \u0275fac=function(n){return new(n||r)};static \u0275pipe=i({name:"seminarStatus",type:r,pure:!0})};export{o as a};
