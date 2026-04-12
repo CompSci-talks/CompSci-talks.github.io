@@ -61,3 +61,4 @@ verification_log.md
 TEST_ACCOUNTS.md
 todos.md
 verify-supabase.js
+scripts/firebase-scripts/
