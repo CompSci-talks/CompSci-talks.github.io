@@ -102,7 +102,7 @@ export class ArchiveComponent implements OnInit {
     }
 
     getTagSummary(): string {
-        return this.getSummaryLabel(this.selectedTagIds, this.availableTags, 'Filter by tags');
+        return this.getSummaryLabel(this.selectedTagIds, this.availableTags, 'Filter by topics');
     }
 
     getSpeakerSummary(): string {
