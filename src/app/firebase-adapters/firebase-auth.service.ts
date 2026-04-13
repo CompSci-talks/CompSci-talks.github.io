@@ -1,12 +1,11 @@
 import { Injectable, inject, NgZone, signal } from '@angular/core';
-import { Auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, User as FirebaseUser, sendEmailVerification, sendPasswordResetEmail, verifyPasswordResetCode, confirmPasswordReset, applyActionCode } from '@angular/fire/auth';
+import { Auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, User as FirebaseUser, setPersistence, browserLocalPersistence, sendEmailVerification, sendPasswordResetEmail, verifyPasswordResetCode, confirmPasswordReset, applyActionCode } from '@angular/fire/auth';
 import { BehaviorSubject, Observable, from, map, take, tap, switchMap, Subscription, throwError } from 'rxjs';
 import { IAuthService } from '../core/contracts/auth.interface';
 import { USER_SERVICE } from '../core/contracts/user.service.interface';
 import { User, UserRole } from '../core/models/user.model';
 import { Firestore } from '@angular/fire/firestore';
 import { isNameUnique } from '../core/utils/firestore-utils';
-import { VercelMailService } from '../core/services/vercel-mail-service';
 
 @Injectable({
     providedIn: 'root'
@@ -16,7 +15,6 @@ export class FirebaseAuthService implements IAuthService {
     private auth = inject(Auth);
     private userService = inject(USER_SERVICE);
     private firestore = inject(Firestore);
-    private vercelMail = inject(VercelMailService);
 
     private userSubject = new BehaviorSubject<User | null>(null);
     private initializedSubject = new BehaviorSubject<boolean>(false);
@@ -109,25 +107,21 @@ export class FirebaseAuthService implements IAuthService {
     sendVerificationEmail(): Observable<void> {
         if (!this.auth.currentUser) return throwError(() => new Error('No user logged in'));
 
-        const user = this.auth.currentUser;
-        const actionCodeSettings = { url: window.location.origin + '/verify-email' };
+        // Use ActionCodeSettings to point back to our verify-email page
+        const actionCodeSettings = {
+            url: window.location.origin + '/verify-email'
+        };
 
-        return from(sendEmailVerification(user, actionCodeSettings)).pipe(
-            tap(() => {
-                if (!user.email) return;
-                void user.getIdToken().then(idToken =>
-                    this.vercelMail.sendVerificationEmail(user.email!, user.displayName || user.email!, idToken)
-                );
-            })
-        );
+        return from(sendEmailVerification(this.auth.currentUser, actionCodeSettings));
     }
 
     sendPasswordResetEmail(email: string): Observable<void> {
-        const actionCodeSettings = { url: window.location.origin + '/reset-password' };
+        // Use ActionCodeSettings to point back to our reset-password page
+        const actionCodeSettings = {
+            url: window.location.origin + '/reset-password'
+        };
 
-        return from(sendPasswordResetEmail(this.auth, email, actionCodeSettings)).pipe(
-            tap(() => void this.vercelMail.sendPasswordResetEmail(email))
-        );
+        return from(sendPasswordResetEmail(this.auth, email, actionCodeSettings));
     }
 
     verifyPasswordResetCode(code: string): Observable<string> {
@@ -148,6 +142,7 @@ export class FirebaseAuthService implements IAuthService {
             tap(() => {
                 const firebaseUser = this.auth.currentUser;
                 if (firebaseUser) {
+                    // Manually trigger a refresh of the user object to pick up emailVerified change
                     this.userService.getUserById(firebaseUser.uid).pipe(take(1)).subscribe(profile => {
                         this.zone.run(() => {
                             const mappedUser = this.mapFirebaseUser(firebaseUser, profile?.role, profile?.photo_url, profile?.display_name);

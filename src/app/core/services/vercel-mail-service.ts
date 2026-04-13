@@ -14,8 +14,6 @@ export class VercelMailService implements IEmailService {
     private auth = inject(Auth);
 
     private readonly MAIL_ENDPOINT = 'https://send-mail-gamma.vercel.app/api/send-mail';
-    private readonly VERIFY_MAIL_ENDPOINT = 'https://send-mail-gamma.vercel.app/api/send-verification-mail';
-    private readonly RESET_MAIL_ENDPOINT = 'https://send-mail-gamma.vercel.app/api/send-reset-mail';
 
     send(payload: EmailPayload): Observable<void> {
         const currentUser = this.auth.currentUser;
@@ -79,33 +77,5 @@ export class VercelMailService implements IEmailService {
                 } as SentEmail;
             });
         }));
-    }
-
-    sendVerificationEmail(email: string, displayName: string, idToken: string): Promise<void> {
-        return fetch(this.VERIFY_MAIL_ENDPOINT, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                email,
-                displayName,
-                continueUrl: window.location.origin + '/verify-email',
-                idToken
-            })
-        }).then(async res => {
-            if (!res.ok) console.warn('[VercelMailService] Verification email failed:', await res.text());
-        }).catch(err => console.warn('[VercelMailService] Verification email error:', err));
-    }
-
-    sendPasswordResetEmail(email: string): Promise<void> {
-        return fetch(this.RESET_MAIL_ENDPOINT, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                email,
-                continueUrl: window.location.origin + '/reset-password'
-            })
-        }).then(async res => {
-            if (!res.ok) console.warn('[VercelMailService] Reset email failed:', await res.text());
-        }).catch(err => console.warn('[VercelMailService] Reset email error:', err));
     }
 }
