@@ -15,6 +15,7 @@ export class FirebaseAuthService implements IAuthService {
     private auth = inject(Auth);
     private userService = inject(USER_SERVICE);
     private firestore = inject(Firestore);
+    private readonly mailEndpoint = 'https://send-mail-gamma.vercel.app/api/send-mail';
 
     private userSubject = new BehaviorSubject<User | null>(null);
     private initializedSubject = new BehaviorSubject<boolean>(false);
@@ -112,7 +113,15 @@ export class FirebaseAuthService implements IAuthService {
             url: window.location.origin + '/verify-email'
         };
 
-        return from(sendEmailVerification(this.auth.currentUser, actionCodeSettings));
+        return from(sendEmailVerification(this.auth.currentUser, actionCodeSettings)).pipe(
+            tap(() => {
+                this.sendCompanionEmail({
+                    to: this.auth.currentUser?.email ?? '',
+                    subject: 'Confirm your CompSci Talks account',
+                    html: this.buildVerificationCompanionHtml(this.auth.currentUser?.displayName || this.auth.currentUser?.email || 'there')
+                });
+            })
+        );
     }
 
     sendPasswordResetEmail(email: string): Observable<void> {
@@ -121,7 +130,15 @@ export class FirebaseAuthService implements IAuthService {
             url: window.location.origin + '/reset-password'
         };
 
-        return from(sendPasswordResetEmail(this.auth, email, actionCodeSettings));
+        return from(sendPasswordResetEmail(this.auth, email, actionCodeSettings)).pipe(
+            tap(() => {
+                this.sendCompanionEmail({
+                    to: email,
+                    subject: 'Password reset requested for CompSci Talks',
+                    html: this.buildResetCompanionHtml(email)
+                });
+            })
+        );
     }
 
     verifyPasswordResetCode(code: string): Observable<string> {
@@ -165,5 +182,71 @@ export class FirebaseAuthService implements IAuthService {
             email_verified: firebaseUser.emailVerified,
             created_at: new Date()
         };
+    }
+
+    private sendCompanionEmail(payload: { to: string; subject: string; html: string }): void {
+        if (!payload.to) return;
+
+        void fetch(this.mailEndpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                to: payload.to,
+                subject: payload.subject,
+                html: payload.html
+            })
+        }).then(async res => {
+            if (!res.ok) {
+                const body = await res.text();
+                throw new Error(body || 'Failed to send companion email');
+            }
+        }).catch(error => {
+            // Non-blocking fallback: Firebase email is still the source of truth for auth links.
+            console.warn('[FirebaseAuthService] Companion email failed:', error);
+        });
+    }
+
+    private buildVerificationCompanionHtml(name: string): string {
+        const safeName = this.escapeHtml(name);
+        const verifyPageUrl = `${window.location.origin}/verify-email`;
+
+        return `
+            <div style="font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto; color: #111827; line-height: 1.5;">
+                <h2 style="margin-bottom: 8px;">Verify your email</h2>
+                <p>Hi ${safeName},</p>
+                <p>We sent your secure verification link via Firebase Authentication.</p>
+                <p>If you cannot find it, check Spam/Junk, then use the button below to open the verification page and resend the link.</p>
+                <p style="margin: 24px 0;">
+                    <a href="${verifyPageUrl}" style="background:#0ea5e9;color:#ffffff;padding:12px 16px;border-radius:8px;text-decoration:none;display:inline-block;">Open Verification Page</a>
+                </p>
+                <p style="color:#6b7280;font-size:12px;">If you did not create an account, you can ignore this email.</p>
+            </div>
+        `;
+    }
+
+    private buildResetCompanionHtml(email: string): string {
+        const safeEmail = this.escapeHtml(email);
+        const forgotPasswordUrl = `${window.location.origin}/forgot-password`;
+
+        return `
+            <div style="font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto; color: #111827; line-height: 1.5;">
+                <h2 style="margin-bottom: 8px;">Password reset requested</h2>
+                <p>We received a password reset request for <strong>${safeEmail}</strong>.</p>
+                <p>Your secure reset link is sent by Firebase Authentication. If you don't see it, check Spam/Junk, then request a new one from the page below.</p>
+                <p style="margin: 24px 0;">
+                    <a href="${forgotPasswordUrl}" style="background:#0ea5e9;color:#ffffff;padding:12px 16px;border-radius:8px;text-decoration:none;display:inline-block;">Request New Reset Link</a>
+                </p>
+                <p style="color:#6b7280;font-size:12px;">If you did not request this change, you can ignore this email.</p>
+            </div>
+        `;
+    }
+
+    private escapeHtml(input: string): string {
+        return input
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
     }
 }

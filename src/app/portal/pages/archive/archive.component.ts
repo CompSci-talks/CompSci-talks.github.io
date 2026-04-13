@@ -75,7 +75,12 @@ export class ArchiveComponent implements OnInit {
     }
 
     toggleFilterControls(): void {
-        this.showFilterControls = !this.showFilterControls;
+        if (this.showFilterControls) {
+            this.clearFilters();
+            return;
+        }
+
+        this.showFilterControls = true;
     }
 
     toggleTag(tagId: string): void {
