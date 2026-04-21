@@ -5,5 +5,6 @@ export const STORAGE_SERVICE = new InjectionToken<IStorageService>('STORAGE_SERV
 
 export interface IStorageService {
     uploadProfilePicture(uid: string, file: File): Observable<string>;
+    uploadSeminarThumbnail(file: File): Observable<string>;
     deleteFile(url: string): Observable<void>;
 }

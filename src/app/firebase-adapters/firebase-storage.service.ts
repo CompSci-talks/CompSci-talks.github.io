@@ -9,7 +9,16 @@ export class FirebaseStorageService implements IStorageService {
 
     uploadProfilePicture(uid: string, file: File): Observable<string> {
         const filePath = `profile_pictures/${uid}/${Date.now()}_${file.name}`;
-        const storageRef = ref(this.storage, filePath);
+        return this.uploadToPath(filePath, file);
+    }
+
+    uploadSeminarThumbnail(file: File): Observable<string> {
+        const filePath = `seminar_thumbnails/${Date.now()}_${file.name}`;
+        return this.uploadToPath(filePath, file);
+    }
+
+    private uploadToPath(path: string, file: File): Observable<string> {
+        const storageRef = ref(this.storage, path);
         const uploadTask = uploadBytesResumable(storageRef, file);
 
         return new Observable<string>(observer => {
