@@ -11,7 +11,12 @@ import { SafeUrlPipe } from '../../../core/pipes/safe-url.pipe';
 export class SlideViewerComponent {
     @Input({ required: true }) presentationId!: string;
 
-    // Changed to generic Google Drive preview format to support PDFs and other file types
+    /** True when the stored value is an OneDrive / SharePoint URL (embed or sharing). */
+    get isOneDrive(): boolean {
+        return /sharepoint\.com\/.+/.test(this.presentationId) || /1drv\.ms\//.test(this.presentationId);
+    }
+
+    /** Google Drive preview embed URL. */
     get embedUrl(): string {
         return `https://drive.google.com/file/d/${this.presentationId}/preview`;
     }

@@ -1,5 +1,18 @@
-<div
-    class="slide-container relative w-full overflow-hidden pt-[56.25%] bg-surface-muted rounded-lg shadow-sm border border-border">
-    <iframe [src]="embedUrl | safeUrl" class="absolute top-0 left-0 w-full h-full border-0" allowfullscreen>
-    </iframe>
-</div>
+<ng-container *ngIf="isOneDrive; else driveEmbed">
+    <!-- OneDrive / SharePoint: embed the URL directly in an iframe -->
+    <div
+        class="slide-container relative w-full overflow-hidden pt-[56.25%] bg-surface-muted rounded-lg shadow-sm border border-border">
+        <iframe [src]="presentationId | safeUrl" class="absolute top-0 left-0 w-full h-full border-0" allowfullscreen
+            title="Seminar presentation">
+        </iframe>
+    </div>
+</ng-container>
+
+<ng-template #driveEmbed>
+    <!-- Google Drive: use constructed preview URL -->
+    <div
+        class="slide-container relative w-full overflow-hidden pt-[56.25%] bg-surface-muted rounded-lg shadow-sm border border-border">
+        <iframe [src]="embedUrl | safeUrl" class="absolute top-0 left-0 w-full h-full border-0" allowfullscreen>
+        </iframe>
+    </div>
+</ng-template>
