@@ -1,22 +1,41 @@
-import { Component, inject } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { Component, inject, signal } from '@angular/core';
+import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AUTH_SERVICE } from '../../../core/contracts/auth.interface';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule],
   template: `
-    <div class="flex bg-surface-muted min-h-screen">
+    <div class="flex bg-surface-muted min-h-screen relative overflow-hidden">
+      <!-- Mobile Backdrop -->
+      @if (sidebarOpen()) {
+        <div 
+          class="fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity"
+          (click)="toggleSidebar()"
+          aria-hidden="true"
+        ></div>
+      }
 
       <!-- Sidebar -->
-      <aside class="w-64 bg-sidebar-bg text-sidebar-text-active flex flex-col flex-shrink-0 sticky top-0 h-screen">
-
+      <aside 
+        class="w-64 bg-sidebar-bg text-sidebar-text-active flex flex-col flex-shrink-0 fixed md:sticky top-0 h-screen z-50 transition-transform duration-300 ease-in-out md:translate-x-0"
+        [class.translate-x-0]="sidebarOpen()"
+        [class.-translate-x-full]="!sidebarOpen()"
+      >
         <!-- Brand -->
-        <div class="px-6 py-5 border-b border-sidebar-border">
-          <p class="text-xs font-semibold text-sidebar-text uppercase tracking-widest mb-1">Admin Portal</p>
-          <h1 class="text-lg font-bold text-sidebar-text-active tracking-tight">CompSci Talks</h1>
+        <div class="px-6 py-5 border-b border-sidebar-border flex items-center justify-between md:block">
+          <div>
+            <p class="text-[10px] font-semibold text-sidebar-text uppercase tracking-widest mb-1">Admin Portal</p>
+            <h1 class="text-base font-bold text-sidebar-text-active tracking-tight">CompSci Talks</h1>
+          </div>
+          <button class="md:hidden text-sidebar-text hover:text-white" (click)="toggleSidebar()">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
         </div>
 
         <!-- Nav -->
@@ -69,15 +88,6 @@ import { AUTH_SERVICE } from '../../../core/contracts/auth.interface';
             User Management
           </a>
 
-          <!-- <a routerLink="email-settings" routerLinkActive="bg-sidebar-bg-active text-sidebar-text-active"
-             class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-sidebar-text rounded-lg hover:bg-sidebar-bg-hover hover:text-sidebar-text-active transition-colors group">
-            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            Email Settings
-          </a> -->
-
         </nav>
 
         <!-- Footer -->
@@ -92,13 +102,20 @@ import { AUTH_SERVICE } from '../../../core/contracts/auth.interface';
       </aside>
 
       <!-- Main Content -->
-      <main class="flex-1 flex flex-col min-w-0">
-
+      <main class="flex-1 flex flex-col min-w-0 md:ml-0 transition-all duration-300 w-full h-screen overflow-y-auto">
         <!-- Top bar -->
-        <header class="h-14 bg-sidebar-top-bar-bg border-b border-sidebar-top-bar-border flex items-center justify-between px-8 flex-shrink-0 sticky top-0 z-10">
-          <span class="text-xs font-semibold text-sidebar-top-bar-text uppercase tracking-widest">Dashboard</span>
+        <header class="h-14 bg-sidebar-top-bar-bg border-b border-sidebar-top-bar-border flex items-center justify-between px-4 md:px-8 flex-shrink-0 sticky top-0 z-10">
           <div class="flex items-center gap-3">
-            <span class="text-xs text-sidebar-top-bar-text">Logged in as Admin</span>
+            <button class="md:hidden text-sidebar-top-bar-text hover:text-text-main" (click)="toggleSidebar()">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+              </svg>
+            </button>
+            <span class="text-xs font-semibold text-sidebar-top-bar-text uppercase tracking-widest hidden sm:inline-block">Dashboard</span>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <span class="text-xs text-sidebar-top-bar-text hidden sm:inline-block">Admin</span>
             <div class="w-8 h-8 rounded-full bg-sidebar-bg-active flex items-center justify-center overflow-hidden">
               @if (auth.currentUser$ | async; as user) {
                 @if (user.photo_url) {
@@ -111,8 +128,8 @@ import { AUTH_SERVICE } from '../../../core/contracts/auth.interface';
           </div>
         </header>
 
-        <!-- Page content — all admin pages render here with consistent padding -->
-        <div class="flex-1 p-8">
+        <!-- Page content -->
+        <div class="flex-1 p-4 md:p-8">
           <router-outlet></router-outlet>
         </div>
 
@@ -122,4 +139,20 @@ import { AUTH_SERVICE } from '../../../core/contracts/auth.interface';
 })
 export class AdminLayoutComponent {
   auth = inject(AUTH_SERVICE);
+  private router = inject(Router);
+
+  sidebarOpen = signal<boolean>(false);
+
+  constructor() {
+    // Close sidebar on navigation (for mobile)
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.sidebarOpen.set(false);
+    });
+  }
+
+  toggleSidebar() {
+    this.sidebarOpen.update(v => !v);
+  }
 }

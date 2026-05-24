@@ -1,14 +1,15 @@
 <div class="w-full bg-gallery-surface min-h-screen">
     <!-- Top Section: Title & High-level Filters -->
     <div class="px-8 pt-8 pb-4 space-y-6">
-        <div class="flex items-end justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
-                <h2 class="text-4xl font-bold text-gallery-on-surface tracking-tight leading-none">Contact Us
+                <h2 class="text-3xl sm:text-4xl font-bold text-gallery-on-surface tracking-tight leading-none">Contact
+                    Us
                     submissions
                 </h2>
                 <p class="text-gallery-on-surface-variant mt-2 max-w-lg"></p>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex flex-wrap items-center gap-3">
                 <span class="text-xs font-bold uppercase tracking-widest text-gallery-outline">Show:</span>
                 <div class="flex gap-2 p-1 bg-gallery-surface-container rounded-xl">
                     <button (click)="setStatusFilter('all')"

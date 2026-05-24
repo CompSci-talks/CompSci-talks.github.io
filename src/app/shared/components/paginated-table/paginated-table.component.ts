@@ -7,8 +7,8 @@ import { PaginationComponent } from '../pagination/pagination.component';
   standalone: true,
   imports: [CommonModule, PaginationComponent],
   template: `
-  <div class="shadow-sm sm:rounded-xl bg-surface-card border border-border">
-    <div>
+  <div class="shadow-sm sm:rounded-xl bg-surface-card border border-border overflow-hidden">
+    <div class="overflow-x-auto">
       <table
         class="w-full text-sm text-left text-text-muted"
         [attr.aria-label]="ariaLabel || 'Data Table'"

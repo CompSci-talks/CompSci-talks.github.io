@@ -13,8 +13,15 @@ export class FirebaseStorageService implements IStorageService {
     }
 
     uploadSeminarThumbnail(file: File): Observable<string> {
-        const filePath = `seminar_thumbnails/${Date.now()}_${file.name}`;
-        return this.uploadToPath(filePath, file);
+        return new Observable<string>(observer => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                observer.next(reader.result as string);
+                observer.complete();
+            };
+            reader.onerror = (error) => observer.error(error);
+            reader.readAsDataURL(file);
+        });
     }
 
     private uploadToPath(path: string, file: File): Observable<string> {
