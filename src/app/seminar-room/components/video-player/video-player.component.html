@@ -1,8 +1,11 @@
 <ng-container *ngIf="isOneDrive; else driveEmbed">
-    <!-- OneDrive / SharePoint: embed directly in iframe -->
+    <!-- OneDrive / SharePoint: embed directly in iframe.
+         The Stream player needs more height than 16:9 gives on narrow phones,
+         otherwise its control bar gets clipped, so enforce a min height. -->
     <div
-        class="video-container relative w-full overflow-hidden pt-[56.25%] bg-black rounded-lg shadow-md border border-border">
-        <iframe [src]="videoId | safeUrl" class="absolute top-0 left-0 w-full h-full border-0" allowfullscreen
+        class="video-container relative w-full aspect-video min-h-[260px] sm:min-h-0 overflow-hidden bg-black rounded-lg shadow-md border border-border">
+        <iframe [src]="videoId | safeUrl" class="absolute inset-0 w-full h-full border-0" scrolling="no"
+            allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen
             title="Seminar video">
         </iframe>
     </div>
@@ -11,13 +14,13 @@
 <ng-template #driveEmbed>
     <!-- Google Drive: standard iframe embed -->
     <div
-        class="video-container relative w-full overflow-hidden pt-[56.25%] bg-black rounded-lg shadow-md border border-border">
-        <iframe [src]="embedUrl | safeUrl" class="absolute top-0 left-0 w-full h-full border-0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        class="video-container relative w-full aspect-video min-h-[220px] sm:min-h-0 overflow-hidden bg-black rounded-lg shadow-md border border-border">
+        <iframe [src]="embedUrl | safeUrl" class="absolute inset-0 w-full h-full border-0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture"
             allowfullscreen>
         </iframe>
-        <!-- Overlay to block the pop-out button in the top right -->
-        <div class="absolute top-0 right-0 w-[60px] h-[60px] z-10 pointer-events-auto bg-transparent cursor-default">
+        <!-- Overlay to block the pop-out button in the top right (desktop only, it covers player UI on small screens) -->
+        <div class="hidden sm:block absolute top-0 right-0 w-[60px] h-[60px] z-10 pointer-events-auto bg-transparent cursor-default">
         </div>
     </div>
 </ng-template>

@@ -61,11 +61,19 @@ export class AppComponent implements OnInit {
       })
     ).subscribe();
 
+    // Redirect admins to the dashboard only once per sign-in, so they can still
+    // navigate back to the public portal afterwards without being bounced.
+    let redirectedUserId: string | null = null;
     this.auth.currentUser$.subscribe(user => {
-      console.log('[AppComponent] Current user role:', user?.role);
+      if (!user) {
+        redirectedUserId = null;
+        return;
+      }
+      if (user.role !== 'admin' || redirectedUserId === user.id) return;
+      redirectedUserId = user.id;
       const currentUrl = this.router.url;
       const isEntryRoute = currentUrl === '/' || currentUrl === '/login';
-      if (user?.role === 'admin' && isEntryRoute) {
+      if (isEntryRoute) {
         this.router.navigate(['/admin']);
       }
     });

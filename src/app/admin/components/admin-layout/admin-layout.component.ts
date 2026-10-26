@@ -21,7 +21,7 @@ import { filter } from 'rxjs/operators';
 
       <!-- Sidebar -->
       <aside 
-        class="w-64 bg-sidebar-bg text-sidebar-text-active flex flex-col flex-shrink-0 fixed md:sticky top-0 h-screen z-50 transition-transform duration-300 ease-in-out md:translate-x-0"
+        class="w-64 bg-sidebar-bg text-sidebar-text-active flex flex-col flex-shrink-0 fixed md:sticky top-0 h-screen h-[100dvh] z-50 transition-transform duration-300 ease-in-out md:translate-x-0"
         [class.translate-x-0]="sidebarOpen()"
         [class.-translate-x-full]="!sidebarOpen()"
       >
@@ -102,7 +102,7 @@ import { filter } from 'rxjs/operators';
       </aside>
 
       <!-- Main Content -->
-      <main class="flex-1 flex flex-col min-w-0 md:ml-0 transition-all duration-300 w-full h-screen overflow-y-auto">
+      <main class="flex-1 flex flex-col min-w-0 md:ml-0 transition-all duration-300 w-full h-screen h-[100dvh] overflow-y-auto">
         <!-- Top bar -->
         <header class="h-14 bg-sidebar-top-bar-bg border-b border-sidebar-top-bar-border flex items-center justify-between px-4 md:px-8 flex-shrink-0 sticky top-0 z-10">
           <div class="flex items-center gap-3">
