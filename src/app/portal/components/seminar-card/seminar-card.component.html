@@ -1,7 +1,7 @@
 <a [routerLink]="['/seminar', seminar.id]"
   class="card flex flex-col transition-all cursor-pointer w-full h-full relative group p-0 overflow-hidden">
   <!-- Thumbnail -->
-  <div class="h-48 w-full bg-surface-muted relative overflow-hidden">
+  <div class="aspect-video w-full bg-surface-muted relative overflow-hidden">
     <!-- Skeleton while loading -->
     <div *ngIf="!imageLoaded && !hasImageError"
       class="absolute inset-0 bg-surface-muted animate-pulse-skeleton z-10 flex items-center justify-center">
