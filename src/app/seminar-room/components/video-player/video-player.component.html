@@ -23,8 +23,8 @@
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture"
             allowfullscreen>
         </iframe>
-        <!-- Overlay to block the pop-out button in the top right (desktop only, it covers player UI on small screens) -->
-        <div class="hidden sm:block absolute top-0 right-0 w-[60px] h-[60px] z-10 pointer-events-auto bg-transparent cursor-default">
+        <!-- Overlay to block the pop-out button in the top right (smaller on phones, where the scaled-down button is ~14px) -->
+        <div class="absolute top-0 right-0 w-7 h-7 sm:w-[60px] sm:h-[60px] z-10 pointer-events-auto bg-transparent cursor-default">
         </div>
     </div>
 </ng-template>
