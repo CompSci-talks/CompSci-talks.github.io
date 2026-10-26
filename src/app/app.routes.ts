@@ -64,55 +64,7 @@ export const routes: Routes = [
     {
         path: 'admin',
         canActivate: [AdminGuard],
-        loadComponent: () => import('./admin/components/admin-layout/admin-layout.component').then(m => m.AdminLayoutComponent),
-        children: [
-            { path: '', redirectTo: 'seminars', pathMatch: 'full' },
-            // TODO: implement semester manager
-            // {
-            //     path: 'semesters',
-            //     loadComponent: () => import('./admin/pages/semester-manager/semester-manager.component').then(m => m.SemesterManagerComponent)
-            // },
-            {
-                path: 'seminars',
-                loadComponent: () => import('./admin/pages/seminar-manager/seminar-manager.component').then(m => m.SeminarManagerComponent)
-            },
-            {
-                path: 'feedback',
-                loadComponent: () => import('./admin/pages/contact-us-moderation/contact-us-moderation.component').then(m => m.ContactUsModerationComponent)
-            },
-            {
-                path: 'moderation',
-                loadComponent: () => import('./admin/pages/comment-moderation/comment-moderation.component').then(m => m.CommentModerationComponent)
-            },
-            {
-                path: 'speakers',
-                loadComponent: () => import('./admin/pages/speaker-manager/speaker-manager.component').then(m => m.SpeakerManagerComponent)
-            },
-            {
-                path: 'tags',
-                loadComponent: () => import('./admin/pages/tag-manager/tag-manager.component').then(m => m.TagManagerComponent)
-            },
-            {
-                path: 'seminar/:id/attendance',
-                loadComponent: () => import('./admin/pages/attendance/attendance.page').then(m => m.AttendancePageComponent)
-            },
-            {
-                path: 'user-management',
-                loadComponent: () => import('./admin/pages/user-management-page/user-management-page.component').then(m => m.UserManagementPageComponent)
-            },
-            {
-                path: 'user/:id',
-                loadComponent: () => import('./admin/pages/user-detail-page/user-detail-page.component').then(m => m.UserDetailPageComponent)
-            },
-            {
-                path: 'email-composer',
-                loadComponent: () => import('./admin/pages/email-composer-page/email-composer-page').then(m => m.EmailComposerPage)
-            },
-            {
-                path: 'email-settings',
-                loadComponent: () => import('./admin/pages/email-settings/email-settings.component').then(m => m.EmailSettingsComponent)
-            }
-        ]
+        loadChildren: () => import('./admin/admin.routes').then(m => m.ADMIN_ROUTES)
     },
 
     { path: '**', redirectTo: '' }

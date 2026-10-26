@@ -1,12 +1,12 @@
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
-import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { routes } from './app.routes';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { environment } from '../environments/environment';
-import { provideQuillConfig } from 'ngx-quill';
+import { provideQuillConfig } from 'ngx-quill/config';
 import { FirebaseSemesterService } from './firebase-adapters/firebase-semester.service';
 import { FirebaseSeminarService } from './firebase-adapters/firebase-seminar.service';
 import { FirebaseAuthService } from './firebase-adapters/firebase-auth.service';
@@ -28,9 +28,6 @@ import { USER_SERVICE } from './core/contracts/user.service.interface';
 import { USER_ACTIVITY_SERVICE } from './core/contracts/user-activity.service.interface';
 import { FirebaseUserProfileService } from './firebase-adapters/firebase-user-profile.service';
 import { FirebaseUserActivityService } from './firebase-adapters/firebase-user-activity.service';
-import { provideStorage, getStorage } from '@angular/fire/storage';
-import { STORAGE_SERVICE } from './core/contracts/storage.interface';
-import { FirebaseStorageService } from './firebase-adapters/firebase-storage.service';
 import { VercelMailService } from './core/services/vercel-mail-service';
 import { CONTACT_SUBMISSION_SERVICE } from './core/contracts/contact-submission.interface';
 import { FirebaseContactSubmissionService } from './firebase-adapters/firebase-contact-submission.service';
@@ -42,16 +39,14 @@ import { provideAnalytics, getAnalytics } from '@angular/fire/analytics';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideStorage(() => getStorage()),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes, withInMemoryScrolling({ scrollPositionRestoration: 'top' })),
     // Firebase Setup
     provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
     provideAuth(() => getAuth()),
     provideFirestore(() => getFirestore()),
-    provideAnimations(),
+    provideAnimationsAsync(),
     // Core Firebase Service Injection
-    { provide: STORAGE_SERVICE, useClass: FirebaseStorageService },
     { provide: SEMESTER_SERVICE, useClass: FirebaseSemesterService },
     { provide: SEMINAR_SERVICE, useClass: FirebaseSeminarService },
     { provide: AUTH_SERVICE, useClass: FirebaseAuthService },
