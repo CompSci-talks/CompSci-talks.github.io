@@ -20,7 +20,7 @@ import { User } from '../../../core/models/user.model';
       [currentPage]="currentPage"
       [hasMore]="hasMore"
       (pageChange)="pageChange.emit($event)"
-      [trackByProperty]="'uid'"
+      [trackByProperty]="'id'"
       emptyMessage="No users found."
     >
       <ng-template #header>

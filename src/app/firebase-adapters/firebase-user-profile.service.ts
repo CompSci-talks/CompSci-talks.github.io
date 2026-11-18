@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Firestore, collectionData, docData } from '@angular/fire/firestore';
-import { collection, doc, query, where, getDoc, getDocs, updateDoc, setDoc, limit, startAfter, orderBy, arrayUnion, arrayRemove, increment, deleteDoc, writeBatch } from 'firebase/firestore';
-import { Observable, from, map, of, catchError, switchMap } from 'rxjs';
+import { collection, doc, query, where, getDoc, getDocs, updateDoc, setDoc, limit, startAfter, orderBy, documentId, arrayUnion, arrayRemove, increment, deleteDoc, writeBatch } from 'firebase/firestore';
+import { Observable, from, map, of, catchError, switchMap, defer } from 'rxjs';
 import { IUserService } from '../core/contracts/user.service.interface';
 import { User } from '../core/models/user.model';
 import { sanitizeForFirestore } from '../core/utils/firestore-utils';
@@ -14,39 +14,28 @@ export class FirebaseUserProfileService implements IUserService {
     private usersCollection = collection(this.firestore, 'users');
 
     getUsers(pageSize: number, lastUser?: User, filter?: string): Observable<User[]> {
-        let q = query(this.usersCollection, orderBy('display_name'), limit(pageSize));
-
-        if (filter) {
-            q = query(this.usersCollection,
-                where('display_name', '>=', filter),
-                where('display_name', '<=', filter + '\uf8ff'),
-                orderBy('display_name'),
-                limit(pageSize)
-            );
-        }
-
-        // Handle cursor pagination
-        // Note: For real cursor pagination, we need the DocumentSnapshot of the lastUser.
-        // For simplicity in this implementation, we might need to fetch the doc first or 
-        // rely on the caller passing the snapshot. But IUserService uses UserProfile.
-        // We can fetch the last user's document to get the snapshot.
-
-        return from(this.fetchWithCursor(q, lastUser)).pipe(
-            map(snapshot => snapshot.docs.map(d => this.mapToProfile({ ...(d.data() as any), uid: d.id }))),
-            catchError(error => {
-                console.error('Error fetching users:', error);
-                return of([]);
-            })
-        );
-    }
-    private async fetchWithCursor(q: any, lastUser?: User) {
-        if (lastUser) {
-            const lastDoc = await getDoc(doc(this.firestore, `users/${lastUser.id}`));
-            if (lastDoc.exists()) {
-                q = query(q, startAfter(lastDoc));
+        return defer(async () => {
+            // Every document has an ID. Ordering by display_name silently excludes legacy
+            // profiles with only displayName, or profiles whose name has not been filled in.
+            const search = (filter || '').trim().toLocaleLowerCase();
+            const batchSize = search ? Math.max(pageSize, 50) : pageSize;
+            const users: User[] = [];
+            let cursor = lastUser?.id;
+            while (users.length < pageSize) {
+                let q = query(this.usersCollection, orderBy(documentId()), limit(batchSize));
+                if (cursor) q = query(q, startAfter(cursor));
+                const snapshot = await getDocs(q);
+                for (const record of snapshot.docs) {
+                    const user = this.mapToProfile({ ...record.data(), uid: record.id });
+                    cursor = record.id;
+                    if (!search || user.display_name.toLocaleLowerCase().includes(search)
+                        || user.email.toLocaleLowerCase().includes(search)) users.push(user);
+                    if (users.length === pageSize) break;
+                }
+                if (snapshot.size < batchSize) break;
             }
-        }
-        return getDocs(q);
+            return users;
+        });
     }
 
     getUserById(uid: string): Observable<User | null> {

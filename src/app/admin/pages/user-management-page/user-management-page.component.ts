@@ -1,4 +1,5 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { USER_SERVICE } from '../../../core/contracts/user.service.interface';
@@ -7,7 +8,7 @@ import { User as AppUser } from '../../../core/models/user.model';
 import { UserListComponent } from '../../components/user-list/user-list.component';
 import { TextFilterComponent } from '../../../shared/components/text-filter/text-filter.component';
 import { ToastService } from '../../../core/services/toast.service';
-import { BehaviorSubject, combineLatest, debounceTime, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, combineLatest, debounceTime, switchMap, tap, catchError, of } from 'rxjs';
 import { EmailSelectionService } from '../../services/email-selection.service';
 
 @Component({
@@ -33,20 +34,23 @@ import { EmailSelectionService } from '../../services/email-selection.service';
           </button>
           <app-text-filter
             class="w-64"
-            placeholder="Search by name..."
+            placeholder="Search by name or email..."
             (filterChange)="onFilterChange($event)"
           ></app-text-filter>
         </div>
       </div>
 
-      <div class="admin-card">
+      <div *ngIf="loadError" role="alert" class="mb-4 p-4 border border-status-error rounded-lg">
+        {{ loadError }} <button class="btn btn-outline ml-3" (click)="retry()">Retry</button>
+      </div>
+      <div class="admin-card" *ngIf="!loadError">
         <app-user-list
           [users]="users"
           [loading]="loading"
           [selectedUserIds]="selectedUserIds"
           [currentUserId]="currentUserId"
           [currentPage]="currentPage"
-          [hasMore]="hasMore"
+          [hasMore]="hasMore && !loading"
           (viewDetail)="onViewDetail($event)"
           (selectionChange)="onSelectionChange($event)"
           (roleChange)="onRoleChange($event)"
@@ -58,6 +62,7 @@ import { EmailSelectionService } from '../../services/email-selection.service';
 })
 export class UserManagementPageComponent implements OnInit {
   private userService = inject(USER_SERVICE);
+  private destroyRef = inject(DestroyRef);
   private authService = inject(AUTH_SERVICE);
   private toastService = inject(ToastService);
   private router = inject(Router);
@@ -65,6 +70,7 @@ export class UserManagementPageComponent implements OnInit {
 
   users: AppUser[] = [];
   loading = true;
+  loadError = '';
   currentPage = 1;
   hasMore = false;
   selectedUserIds: Set<string> = new Set();
@@ -76,31 +82,29 @@ export class UserManagementPageComponent implements OnInit {
   private lastUsers: (AppUser | undefined)[] = [undefined];
 
   ngOnInit(): void {
-    this.authService.currentUser$.subscribe(user => {
+    this.authService.currentUser$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(user => {
       this.currentUserId = user?.id || null;
     });
 
     combineLatest([this.filter$, this.page$]).pipe(
       debounceTime(100),
-      tap(() => this.loading = true),
+      tap(() => { this.loading = true; this.loadError = ''; }),
       switchMap(([filter, page]) => {
         const lastUser = this.lastUsers[page - 1];
-        return this.userService.getUsers(this.pageSize, lastUser, filter);
+        return this.userService.getUsers(this.pageSize + 1, lastUser, filter).pipe(
+          catchError(() => {
+            this.loadError = 'Users could not be loaded. Check your connection and try again.';
+            return of(null);
+          })
+        );
       })
     ).subscribe({
       next: (users) => {
-        this.users = users;
         this.loading = false;
-        this.hasMore = users.length === this.pageSize;
-
-        if (this.hasMore) {
-          this.lastUsers[this.currentPage] = users[users.length - 1];
-        }
-      },
-      error: (err) => {
-        console.error('Failed to load users', err);
-        this.loading = false;
-        this.users = [];
+        if (users === null) return;
+        this.hasMore = users.length > this.pageSize;
+        this.users = users.slice(0, this.pageSize);
+        this.lastUsers[this.currentPage] = this.users.at(-1);
       }
     });
   }
@@ -113,11 +117,16 @@ export class UserManagementPageComponent implements OnInit {
     this.selectedUserIds.clear();
   }
 
+  retry(): void { this.page$.next(this.currentPage); }
+
   onPageChange(direction: 'prev' | 'next'): void {
+    if (this.loading) return;
     if (direction === 'next' && this.hasMore) {
+      this.loading = true;
       this.currentPage++;
       this.page$.next(this.currentPage);
     } else if (direction === 'prev' && this.currentPage > 1) {
+      this.loading = true;
       this.currentPage--;
       this.page$.next(this.currentPage);
     }
