@@ -8,12 +8,12 @@ export interface User {
     role: UserRole;
     photo_url?: string | null;
     email_verified: boolean;
-    created_at: Date;
+    created_at: Date | null;
     last_login?: Date;
-    last_active_at?: Date;
+    last_active_at?: Date | null;
     last_active_timestamp?: Date;
     attendance_count?: number;
     attended_seminar_ids?: string[];
     preferred_topic_areas?: string[];
-    enrollment_date?: Date;
+    enrollment_date?: Date | null;
 }

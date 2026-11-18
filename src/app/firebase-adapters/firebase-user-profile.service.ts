@@ -113,9 +113,9 @@ export class FirebaseUserProfileService implements IUserService {
             email: data.email || '',
             role: data.role || 'authenticated',
             photo_url: data.photo_url || data.photoURL,
-            created_at: this.toDate(data.created_at || data.createdAt),
-            last_active_at: this.toDate(data.last_active_at || data.lastLogin || data.last_login),
-            enrollment_date: this.toDate(data.enrollment_date || data.enrollmentDate),
+            created_at: this.toDate(data.created_at) ?? this.toDate(data.createdAt),
+            last_active_at: this.toDate(data.last_active_at) ?? this.toDate(data.lastLogin) ?? this.toDate(data.last_login),
+            enrollment_date: this.toDate(data.enrollment_date) ?? this.toDate(data.enrollmentDate),
             preferred_topic_areas: data.preferred_topic_areas || data.preferredTopicAreas || [],
             attendance_count: data.attendance_count || data.attendanceCount || 0,
             attended_seminar_ids: data.attended_seminar_ids || data.attendedSeminarIds || [],
@@ -123,11 +123,17 @@ export class FirebaseUserProfileService implements IUserService {
         };
     }
 
-    private toDate(field: any): Date {
-        if (!field) return new Date();
-        if (field.toDate) return field.toDate();
-        if (field instanceof Date) return field;
-        return new Date(field);
+    private toDate(field: unknown): Date | null {
+        if (field === null || field === undefined || field === '') return null;
+        try {
+            const value = field as { toDate?: () => Date };
+            const date = typeof value.toDate === 'function' ? value.toDate()
+                : field instanceof Date ? field
+                : typeof field === 'string' || typeof field === 'number' ? new Date(field) : null;
+            return date && Number.isFinite(date.getTime()) ? date : null;
+        } catch {
+            return null;
+        }
     }
     updatePhotoUrl(uid: string, photo_url: string): Observable<void> {
         const userDoc = doc(this.firestore, `users/${uid}`);

@@ -49,7 +49,7 @@ import { User } from '../../../core/models/user.model';
               </div>
               <div class="flex justify-between items-center">
                 <span class="text-text-muted text-sm">Member Since</span>
-                <span class="text-text-main text-sm font-medium">{{ user.created_at | date:'mediumDate' }}</span>
+                <span class="text-text-main text-sm font-medium">{{ (user.created_at | date:'mediumDate') || 'Not recorded' }}</span>
               </div>
             </div>
           </div>

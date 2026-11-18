@@ -60,11 +60,11 @@ import { User } from '../../../core/models/user.model';
         </div>
         <div>
           <label class="text-[10px] font-bold text-text-faint uppercase tracking-widest block mb-1">Account Created</label>
-          <p class="text-sm text-text-main font-medium">{{ user.enrollment_date | date:'mediumDate' }}</p>
+          <p class="text-sm text-text-main font-medium">{{ (user.created_at | date:'mediumDate') || 'Not recorded' }}</p>
         </div>
         <div>
           <label class="text-[10px] font-bold text-text-faint uppercase tracking-widest block mb-1">Last Activity</label>
-          <p class="text-sm text-text-main font-medium">{{ user.last_active_at | date:'medium' }}</p>
+          <p class="text-sm text-text-main font-medium">{{ (user.last_active_at | date:'medium') || 'Not recorded' }}</p>
         </div>
         <div>
           <label class="text-[10px] font-bold text-text-faint uppercase tracking-widest block mb-2">Interests</label>

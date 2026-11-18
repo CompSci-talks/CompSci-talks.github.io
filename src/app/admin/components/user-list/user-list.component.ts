@@ -52,7 +52,7 @@ import { User } from '../../../core/models/user.model';
               <div class="text-base font-semibold group-hover:text-admin transition-colors">{{user.display_name}}</div>
               <!-- <span *ngIf="!user.email_verified" class="px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded bg-status-error/10 text-status-error border border-status-error/20">Unverified</span> -->
             </div>
-            <div class="font-normal text-text-muted">Last active: {{user.last_active_at | date:'short'}}</div>
+            <div class="font-normal text-text-muted">Last active: {{ (user.last_active_at | date:'short') || 'Not recorded' }}</div>
           </div>
         </th>
         <td class="td-cell">{{user.email}}</td>
@@ -66,7 +66,7 @@ import { User } from '../../../core/models/user.model';
         <td class="td-cell text-center font-medium">
           {{user.attendance_count || 0}}
         </td>
-        <td class="td-cell">{{user.createdAt | date:'mediumDate'}}</td>
+        <td class="td-cell">{{ (user.created_at | date:'mediumDate') || 'Not recorded' }}</td>
         <td class="td-cell">
           <button (click)="viewDetail.emit(user.id)" class="btn-link-admin font-medium hover:underline">View details</button>
         </td>

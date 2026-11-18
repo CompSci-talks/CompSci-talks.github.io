@@ -54,7 +54,7 @@ import { of, catchError, finalize, take, combineLatest } from 'rxjs';
                 </div>
                 <div class="flex justify-between items-center text-sm border-t border-border pt-3">
                   <span class="text-text-muted font-medium">Member Since</span>
-                  <span class="text-text-main font-semibold">{{ user.enrollment_date | date:'mediumDate' }}</span>
+                  <span class="text-text-main font-semibold">{{ (user.enrollment_date | date:'mediumDate') || 'Not recorded' }}</span>
                 </div>
               </div>
             </div>

@@ -52,3 +52,37 @@ describe('User management profile queries', () => {
         await expect(firstValueFrom(service.getUsers(11))).rejects.toThrow('permission-denied');
     });
 });
+
+describe('Stored profile dates', () => {
+    let service: FirebaseUserProfileService;
+    beforeEach(() => {
+        vi.clearAllMocks();
+        TestBed.configureTestingModule({ providers: [{ provide: Firestore, useValue: db }] });
+        service = TestBed.inject(FirebaseUserProfileService);
+    });
+    it('keeps created_at distinct from enrollment_date', async () => {
+        vi.mocked(getDocs).mockResolvedValue(snapshot([{ id: 'a', data: {
+            created_at: { toDate: () => new Date('2026-10-01T10:00:00Z') },
+            enrollment_date: '2026-11-01T10:00:00Z', last_active_at: '2026-11-10T18:26:22Z'
+        } }]) as never);
+        const [user] = await firstValueFrom(service.getUsers(11));
+        expect(user.created_at?.toISOString()).toBe('2026-10-01T10:00:00.000Z');
+        expect(user.enrollment_date?.toISOString()).toBe('2026-11-01T10:00:00.000Z');
+    });
+    it('never substitutes today for a missing or invalid stored date', async () => {
+        vi.mocked(getDocs).mockResolvedValue(snapshot([{ id: 'a', data: {
+            created_at: {}, enrollment_date: 'not-a-date'
+        } }]) as never);
+        const [user] = await firstValueFrom(service.getUsers(11));
+        expect(user.created_at).toBeNull();
+        expect(user.enrollment_date).toBeNull();
+        expect(user.last_active_at).toBeNull();
+    });
+    it('accepts the legacy createdAt field when created_at is absent or corrupt', async () => {
+        vi.mocked(getDocs).mockResolvedValue(snapshot([{ id: 'a', data: {
+            created_at: {}, createdAt: '2026-10-01T10:00:00Z'
+        } }]) as never);
+        const [user] = await firstValueFrom(service.getUsers(11));
+        expect(user.created_at?.toISOString()).toBe('2026-10-01T10:00:00.000Z');
+    });
+});
