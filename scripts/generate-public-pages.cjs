@@ -48,11 +48,27 @@ function talkList(talks, empty) {
     ).join('') + '</ul>';
 }
 
+function seminarDescription(talk) {
+    const abstract = talk.abstract.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!abstract) return `${talk.title}, a CompSci Talks seminar on ${dateFormat.format(talk.date)}.`;
+    const summary = `${talk.title} — ${abstract}`;
+    if (summary.length <= 160) return summary;
+    const excerpt = summary.slice(0, 157);
+    const lastSpace = excerpt.lastIndexOf(' ');
+    return (lastSpace > 100 ? excerpt.slice(0, lastSpace) : excerpt) + '…';
+}
+
 function render(shell, page) {
-    const metadata = `<meta name="description" content="${escapeHtml(page.description)}"><link rel="canonical" href="${origin}${page.path}">`;
+    const canonical = origin + page.path;
+    const metadata = `<meta name="description" content="${escapeHtml(page.description)}"><link rel="canonical" href="${canonical}">`
+        + `<meta property="og:site_name" content="${siteName}"><meta property="og:title" content="${escapeHtml(page.title)}">`
+        + `<meta property="og:description" content="${escapeHtml(page.description)}"><meta property="og:url" content="${canonical}">`
+        + (page.path === '/' ? `<script type="application/ld+json">${JSON.stringify({
+            '@context': 'https://schema.org', '@type': 'WebSite', name: siteName, url: canonical
+        })}</script>` : '');
     return shell.replace(/<title>.*?<\/title>/is, () => `<title>${escapeHtml(page.title)}</title>${metadata}`)
         .replace(/<app-root[^>]*>\s*<\/app-root>/i, () =>
-            `<app-root><main class="container-main section-padding">${links}<h1>${escapeHtml(page.heading)}</h1><p>${escapeHtml(page.description)}</p>${page.content || ''}</main></app-root>`);
+            `<app-root><main class="container-main section-padding">${links}<h1>${escapeHtml(page.heading)}</h1><p>${escapeHtml(page.intro ?? page.description)}</p>${page.content || ''}</main></app-root>`);
 }
 
 async function generatePublicPages(output, loadTalks = fetchPublicTalks, now = Date.now()) {
@@ -64,8 +80,8 @@ async function generatePublicPages(output, loadTalks = fetchPublicTalks, now = D
     const upcoming = talks.filter(talk => talk.date.getTime() > now);
     const past = talks.filter(talk => talk.date.getTime() <= now).reverse();
     const pages = [
-        { path: '/', title: `${siteName} | Computer Science Seminars`, heading: 'The Future Decoded',
-            description: 'CompSci Talks is a computer science seminar series. Explore upcoming talks and browse past sessions from researchers and other guest speakers.' },
+        { path: '/', title: `${siteName} | Computer Science Seminars at Ain Shams University`, heading: 'The Future Decoded',
+            description: 'CompSci Talks is a computer science seminar series at the Faculty of Science, Ain Shams University. Find upcoming seminars and explore past talks.' },
         { path: '/schedule/', title: `Seminar Schedule | ${siteName}`, heading: 'Seminar Schedule',
             description: 'Find upcoming computer science seminars from CompSci Talks.',
             content: talkList(upcoming, 'There are no upcoming talks currently listed.') },
@@ -74,7 +90,8 @@ async function generatePublicPages(output, loadTalks = fetchPublicTalks, now = D
             content: talkList(past, 'There are no past talks currently listed.') },
         ...talks.map(talk => ({
             path: pathFor(talk), title: `${talk.title} | ${siteName}`, heading: talk.title,
-            description: `A CompSci Talks seminar on ${dateFormat.format(talk.date)}.`,
+            description: seminarDescription(talk),
+            intro: `A CompSci Talks seminar on ${dateFormat.format(talk.date)}.`,
             content: (talk.location ? `<p>${escapeHtml(talk.location)}</p>` : '')
                 + (talk.abstract ? `<h2>Abstract</h2><p>${escapeHtml(talk.abstract)}</p>` : '')
         }))
