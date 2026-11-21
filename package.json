@@ -21,7 +21,6 @@
     "@angular/platform-browser": "^21.2.4",
     "@angular/router": "^21.2.4",
     "@emailjs/browser": "^4.4.1",
-    "@supabase/supabase-js": "^2.99.1",
     "@tailwindcss/typography": "^0.5.19",
     "dompurify": "^3.3.3",
     "firebase": "^12.19.0",
