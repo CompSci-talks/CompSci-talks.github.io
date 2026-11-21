@@ -1,12 +1,14 @@
-const { copyFile, mkdtemp, rm } = require('node:fs/promises');
+const { mkdtemp, rm } = require('node:fs/promises');
 const { tmpdir } = require('node:os');
 const { join, resolve } = require('node:path');
+const { generatePublicPages } = require('./generate-public-pages.cjs');
 
 async function publish() {
     const output = resolve('dist/compsci-talks/browser');
+    const count = await generatePublicPages(output);
+    console.log('Generated ' + count + ' public HTML pages and sitemap.');
     const dryRun = process.argv.includes('--dry-run');
     if (dryRun) {
-        await require('node:fs/promises').access(join(output, 'index.html'));
         console.log('Build verified. Dry run skipped publishing to gh-pages.');
         return;
     }
@@ -14,7 +16,6 @@ async function publish() {
     const cache = await mkdtemp(join(tmpdir(), 'cst-pages-'));
     process.env.CACHE_DIR = cache;
     try {
-        await copyFile(join(output, 'index.html'), join(output, '404.html'));
         const pages = require('gh-pages');
         await new Promise((done, fail) => {
             pages.publish(output, { nojekyll: true }, error => error ? fail(error) : done());

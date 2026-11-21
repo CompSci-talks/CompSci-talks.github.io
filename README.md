@@ -57,3 +57,19 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+### Public pages and search indexing
+
+`npm run deploy` builds Angular and generates static HTML for the homepage,
+schedule, archive, and public seminars before publishing to GitHub Pages. It
+reads public seminar data anonymously from Firestore. A failed data fetch
+stops deployment so the published archive isn't replaced with incomplete data.
+
+Run `npm run deploy -- --dry-run` to generate and inspect the files locally.
+Redeploy after a seminar is published, edited, or hidden to refresh the static
+HTML and sitemap. Published HTML can remain in Git history and caches, so
+publish only information intended for public access.
+
+After publishing, verify the site in Google Search Console, submit
+`https://compsci-talks.github.io/sitemap.xml`, and inspect and request indexing
+for the homepage.
