@@ -17,9 +17,16 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/f
                 [id]="inputId" [name]="inputId"
                 [placeholder]="placeholder"
                 [disabled]="isDisabled"
+                [attr.aria-describedby]="inputId + '-visibility-help'"
+                (keydown)="onVisibilityShortcut($event)"
                 [(ngModel)]="value"
                 class="input-field pr-10">
-            <button type="button" (click)="togglePassword()"
+            <span class="sr-only" [id]="inputId + '-visibility-help'">Press Alt+Shift+V to show or hide the password.</span>
+            <button type="button" tabindex="-1" (click)="togglePassword()"
+                [disabled]="isDisabled"
+                [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+                [attr.aria-controls]="inputId"
+                [title]="(showPassword ? 'Hide password' : 'Show password') + ' (Alt+Shift+V)'"
                 class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-main transition-colors">
                 <svg *ngIf="!showPassword" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -47,6 +54,12 @@ export class PasswordInputComponent implements ControlValueAccessor {
   private onTouched = () => { };
 
   togglePassword() { this.showPassword = !this.showPassword; }
+
+  onVisibilityShortcut(event: KeyboardEvent): void {
+    if (event.key.toLowerCase() !== 'v' || !event.altKey || !event.shiftKey || event.ctrlKey || event.metaKey) return;
+    event.preventDefault();
+    if (!event.repeat) this.togglePassword();
+  }
 
   set value(val: string) {
     this._value = val;
